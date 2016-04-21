@@ -6,6 +6,7 @@ derby.log
 Thumbs.db
 ehthumbs.db
 *.lnk
+TransportSystemDB
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
