@@ -19,9 +19,6 @@ import za.co.discovery.assignment.service.ShortestPathService;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * Created by Kapeshi.Kongolo on 2016/04/09.
- */
 @Controller
 public class RootController {
 
@@ -89,7 +86,7 @@ public class RootController {
         return "redirect:/vertices";
     }
 
-    public void buildVertexValidation(String vertexId, Model model) {
+    private void buildVertexValidation(String vertexId, Model model) {
         //avoid useless nulls
         String vertexName = entityManagerService.getVertexById(vertexId) == null ? "" : entityManagerService.getVertexById(vertexId).getName();
         String message = "Planet " + vertexId + " already exists as " + vertexName;
@@ -178,7 +175,7 @@ public class RootController {
         return "redirect:/edge/" + edge.getRecordId();
     }
 
-    public void buildEdgeValidation(@ModelAttribute ShortestPathModel pathModel, Model model, String code) {
+    private void buildEdgeValidation(@ModelAttribute ShortestPathModel pathModel, Model model, String code) {
         String message = "";
         ValidationCodes mode = ValidationCodes.fromString(code);
         if (mode != null) {
@@ -280,7 +277,7 @@ public class RootController {
         return "redirect:/traffic/" + traffic.getRouteId();
     }
 
-    public void buildTrafficValidation(@ModelAttribute ShortestPathModel pathModel, Model model, String code) {
+    private void buildTrafficValidation(@ModelAttribute ShortestPathModel pathModel, Model model, String code) {
         String message = "";
         ValidationCodes mode = ValidationCodes.fromString(code);
         if (mode != null) {
@@ -339,16 +336,16 @@ public class RootController {
         LinkedList<Vertex> paths = shortestPathService.getPath(destination);
         if (paths != null) {
             for (Vertex v : paths) {
-                path.append(v.getName() + " (" + v.getVertexId() + ")");
+                path.append(v.getName()).append(" (").append(v.getVertexId()).append(")");
                 path.append("\t");
             }
         } else if (source != null && destination != null && source.getVertexId().equals(destination.getVertexId())) {
-            path.append(PATH_NOT_NEEDED + source.getName());
+            path.append(PATH_NOT_NEEDED).append(source.getName());
         } else {
             path.append(PATH_NOT_AVAILABLE);
         }
         pathModel.setThePath(path.toString());
-        pathModel.setSelectedVertexName(destination.getName());
+        pathModel.setSelectedVertexName(destination == null ? "" : destination.getName());
         model.addAttribute("shortest", pathModel);
         return "result";
     }
