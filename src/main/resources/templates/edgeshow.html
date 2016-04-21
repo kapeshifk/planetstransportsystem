@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+
+    <title>Interstellar Transport System</title>
+
+    <!--/*/ <th:block th:include="fragments/headerinc :: head"></th:block> /*/-->
+</head>
+<body>
+<div class="container">
+    <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+
+    <h2>Route Details</h2>
+    <div>
+        <form class="form-horizontal">
+            <input type="hidden" th:field="*{recordId}"/>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Route Id:</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static" th:text="${edge.edgeId}">Route Id</p></div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Planet Origin:</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static" th:text="${edge.source}">Planet Origin</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Planet Destination:</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static" th:text="${edge.destination}">Planet Destination</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Distance(Light Years):</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static" th:text="${edge.distance}">Distance(Light Years)</p>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+
+    <title>Interstellar Transport System</title>
+
+    <!--/*/ <th:block th:include="fragments/headerinc :: head"></th:block> /*/-->
+</head>
+<body>
+<div class="container">
+    <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+
+    <h2>Update Route</h2>
+    <div>
+        <form class="form-horizontal" th:action="@{/edgeupdate}" method="post">
+            <input type="hidden" th:field="*{edge.recordId}"/>
+            <input type="hidden" th:field="*{edge.edgeId}"/>
+            <input type="hidden" th:field="*{edge.source}"/>
+            <input type="hidden" th:field="*{edge.destination}"/>
+            <input type="hidden" th:field="*{edge.timeDelay}"/>
+            <div class="form-group">
+                <select id="paths" th:field="*{edgeModel.sourceVertex}" class="form-control input-lg">
+                    <option th:each="v : ${routeList}"
+                            th:value="${v.vertexId}"
+                            th:text="${v.name}+' ('+${v.vertexId}+')'">
+                    </option>
+                </select>
+            </div>
+            <div class="form-group">
+                <select id="paths1" th:field="*{edgeModel.destinationVertex}" class="form-control input-lg">
+                    <option th:each="v : ${routeList}"
+                            th:value="${v.vertexId}"
+                            th:text="${v.name}+' ('+${v.vertexId}+')'">
+                    </option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Distance(Light Years):</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" th:field="*{edge.distance}"/>
+                </div>
+            </div>
+            <div class="form-horizontal">
+                <button type="submit" class="btn btn-success btn-block">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
