@@ -1,10 +1,6 @@
 package za.co.discovery.assignment.dao;
 
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Projections;
+import org.hibernate.*;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -37,21 +33,53 @@ public class TrafficDao {
         session.merge(traffic);
     }
 
-    public int delete(String routeId) {
+    public int delete(Long id) {
         Session session = sessionFactory.getCurrentSession();
-        String qry = "DELETE FROM traffic AS T WHERE T.routeId = :routeIdParameter";
+        String qry = "DELETE FROM traffic AS T WHERE T.id = :idParameter";
         Query query = session.createQuery(qry);
-        query.setParameter("routeIdParameter", routeId);
+        query.setParameter("idParameter", id);
 
         return query.executeUpdate();
     }
 
-    public Traffic selectUnique(String routeId) {
+    public Traffic selectUnique(Long id) {
+        Session session = sessionFactory.getCurrentSession();
+        Criteria criteria = session.createCriteria(Traffic.class);
+        criteria.add(Restrictions.eq("id", id));
+
+        Traffic traffic = (Traffic) criteria.uniqueResult();
+        if (traffic != null) {
+            Hibernate.initialize(traffic.getRoute());
+        }
+        return traffic;
+    }
+
+    public Traffic selectUniqueByRouteId(String routeId) {
         Session session = sessionFactory.getCurrentSession();
         Criteria criteria = session.createCriteria(Traffic.class);
         criteria.add(Restrictions.eq("routeId", routeId));
 
-        return (Traffic) criteria.uniqueResult();
+        Traffic traffic = (Traffic) criteria.uniqueResult();
+        if (traffic != null) {
+            Hibernate.initialize(traffic.getRoute());
+        }
+        return traffic;
+    }
+
+    public List selectTrafficBySourceAndDestination(String source, String destination) {
+        Session session = sessionFactory.getCurrentSession();
+        String hql = "FROM traffic AS T WHERE T.route.source.id = :sourceId AND T.route.destination.id = :destinationId";
+        Query query = session.createQuery(hql);
+        query.setString("sourceId", source);
+        query.setString("destinationId", destination);
+
+        return query.list();
+    }
+
+    public int findNextId() {
+        Session session = sessionFactory.getCurrentSession();
+        String qry = "values ( next value for TRAFFIC_SEQ )";
+        return (int) session.createSQLQuery(qry).uniqueResult();
     }
 
     public List<Traffic> selectAll() {
@@ -62,21 +90,10 @@ public class TrafficDao {
         return (List<Traffic>) criteria.list();
     }
 
-    public long selectMaxRecordId() {
-
-        return (long) sessionFactory.getCurrentSession()
-                .createCriteria(Traffic.class)
-                .setProjection(Projections.rowCount()).uniqueResult();
-    }
-
-    public List<Traffic> trafficExists(Traffic traffic) {
+    public List<Traffic> selectAllLazyLoading() {
         Session session = sessionFactory.getCurrentSession();
-        Criteria criteria = session.createCriteria(Traffic.class);
-        criteria.add(Restrictions.ne("routeId", traffic.getRouteId()));
-        criteria.add(Restrictions.eq("source", traffic.getSource()));
-        criteria.add(Restrictions.eq("destination", traffic.getDestination()));
-
-        //noinspection unchecked
-        return (List<Traffic>) criteria.list();
+        String hql = "FROM traffic AS T LEFT JOIN FETCH T.route";
+        Query query = session.createQuery(hql);
+        return query.list();
     }
 }

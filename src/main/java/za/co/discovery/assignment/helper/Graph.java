@@ -54,13 +54,10 @@ public class Graph {
 
     public void processTraffics() {
         for (Traffic traffic : traffics) {
-            for (Edge edge : edges) {
-                if (checkObjectsEqual(edge.getEdgeId(), traffic.getRouteId())) {
-                    if (checkObjectsEqual(edge.getSource(), traffic.getSource()) && checkObjectsEqual(edge.getDestination(), traffic.getDestination())) {
-                        edge.setTimeDelay(traffic.getDelay());
-                    }
-                }
-            }
+            edges.stream().filter(edge -> edge.equals(traffic.getRoute())).forEach(edge -> {
+                Float actualDistance = edge.getDistance() + traffic.getDelay();
+                edge.setDistance(actualDistance);
+            });
         }
     }
 
@@ -76,27 +73,10 @@ public class Graph {
 
     public Edge copyAdjacentEdge(Edge fromEdge) {
         Edge toEdge = new Edge();
-        toEdge.setEdgeId(fromEdge.getEdgeId());
+        toEdge.setRouteId(fromEdge.getRouteId());
         toEdge.setSource(fromEdge.getDestination());
         toEdge.setDestination(fromEdge.getSource());
         toEdge.setDistance(fromEdge.getDistance());
-        toEdge.setTimeDelay(fromEdge.getTimeDelay());
         return toEdge;
-    }
-
-    public boolean checkObjectsEqual(Object object, Object otherObject) {
-        if (object == null && otherObject == null) {
-            //Both objects are null
-            return true;
-        } else if (object == null || otherObject == null) {
-            //One of the objects is null
-            return false;
-        } else if (object instanceof String && otherObject instanceof String) {
-            return ((String) object).equalsIgnoreCase((String) otherObject);
-        } else {
-            //Both objects are not null
-            return object.equals(otherObject);
-        }
-
     }
 }

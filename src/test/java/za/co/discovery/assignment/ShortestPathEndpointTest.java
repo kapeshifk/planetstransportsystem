@@ -8,6 +8,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import za.co.discovery.assignment.config.DatasourceBean;
 import za.co.discovery.assignment.config.PersistenceBean;
+import za.co.discovery.assignment.config.ResourceBean;
 import za.co.discovery.assignment.config.WebServiceBean;
 import za.co.discovery.assignment.dao.EdgeDao;
 import za.co.discovery.assignment.dao.TrafficDao;
@@ -15,16 +16,14 @@ import za.co.discovery.assignment.dao.VertexDao;
 import za.co.discovery.assignment.schema.GetShortestPathRequest;
 import za.co.discovery.assignment.schema.GetShortestPathResponse;
 import za.co.discovery.assignment.service.EntityManagerService;
+import za.co.discovery.assignment.service.XLSXHandler;
 
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 
 
-/**
- * Created by Kapeshi.Kongolo on 2016/04/20.
- */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {DatasourceBean.class, PersistenceBean.class, WebServiceBean.class,
+@ContextConfiguration(classes = {XLSXHandler.class, ResourceBean.class, DatasourceBean.class, PersistenceBean.class, WebServiceBean.class,
         ShortestPathEndpoint.class, ShortestPathRepository.class, EntityManagerService.class, EdgeDao.class, VertexDao.class,
         TrafficDao.class},
         loader = AnnotationConfigContextLoader.class)

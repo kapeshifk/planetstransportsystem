@@ -4,11 +4,11 @@
 
     <title>Interstellar Transport System</title>
 
-    <!--/*/ <th:block th:include="fragments/headerinc :: head"></th:block> /*/-->
+    <!--/*/ <th:block th:include="headers/headerinc :: head"></th:block> /*/-->
 </head>
 <body>
 <div class="container">
-    <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+    <!--/*/ <th:block th:include="headers/header :: header"></th:block> /*/-->
     <div th:if="${not #lists.isEmpty(vertices)}">
         <h2>Planets</h2>
         <table class="table table-striped">
@@ -20,11 +20,11 @@
                 <th>Delete</th>
             </tr>
             <tr th:each="vertex : ${vertices}">
-                <td th:text="${vertex.vertexId}"><a href="/vertices/${vertex.vertexId}">Id</a></td>
+                <td th:text="${vertex.id}"><a href="/vertices/${vertex.Id}">Id</a></td>
                 <td th:text="${vertex.name}">Planet Name</td>
-                <td><a th:href="${'/vertex/' + vertex.vertexId}">View</a></td>
-                <td><a th:href="${'/vertex/edit/' + vertex.vertexId}">Edit</a></td>
-                <td><a th:href="${'/vertex/delete/' + vertex.vertexId}">Delete</a></td>
+                <td><a th:href="${'/vertex/' + vertex.id}">View</a></td>
+                <td><a th:href="${'/vertex/edit/' + vertex.id}">Edit</a></td>
+                <td><a th:href="${'/vertex/delete/' + vertex.id}">Delete</a></td>
             </tr>
         </table>
 

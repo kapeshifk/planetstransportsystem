@@ -2,11 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head lang="en">
     <title>Interstellar Transport System</title>
-    <!--/*/ <th:block th:include="fragments/headerinc :: head"></th:block> /*/-->
+    <!--/*/ <th:block th:include="headers/headerinc :: head"></th:block> /*/-->
 </head>
 <body>
 <div class="container">
-    <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+    <!--/*/ <th:block th:include="headers/header :: header"></th:block> /*/-->
     <div>
         <h3>Find the shortest path from the source to a destination</h3>
         <form class="form-horizontal" th:action="@{/shortest}" th:object="${shortest}" method="post">
@@ -16,8 +16,8 @@
             <br />
             <select id="paths" th:field="*{selectedVertex}" class="form-control input-lg">
                 <option th:each="v : ${pathList}"
-                        th:value="${v.vertexId}"
-                        th:text="${v.name}+' ('+${v.vertexId}+')'">
+                        th:value="${v.id}"
+                        th:text="${v.name}+' ('+${v.id}+')'">
                 </option>
             </select>
             <br />

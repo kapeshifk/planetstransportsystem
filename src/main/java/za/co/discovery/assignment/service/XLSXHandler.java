@@ -4,17 +4,16 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import za.co.discovery.assignment.entity.Edge;
-import za.co.discovery.assignment.entity.Traffic;
 import za.co.discovery.assignment.entity.Vertex;
+import za.co.discovery.assignment.model.EdgeModel;
+import za.co.discovery.assignment.model.TrafficModel;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,15 +24,13 @@ import java.util.logging.Logger;
 public class XLSXHandler {
     private File file;
 
-    public XLSXHandler() {
-    }
-
+    @Autowired
     public XLSXHandler(File file) {
         this.file = file;
     }
 
-    public List<Vertex> readVertexes() {
-        List<Vertex> vertices = new ArrayList<>();
+    public Map<String, Vertex> readVertexes() {
+        Map<String, Vertex> vertexMap = new LinkedHashMap<>();
         try {
             FileInputStream inputStream = new FileInputStream(this.file);
 
@@ -55,26 +52,27 @@ public class XLSXHandler {
                     int columnIndex = cell.getColumnIndex();
                     switch (columnIndex + 1) {
                         case 1:
-                            vertex.setVertexId((String) getCellValue(cell));
+                            vertex.setId((String) getCellValue(cell));
                             break;
                         case 2:
                             vertex.setName((String) getCellValue(cell));
                             break;
                     }
                 }
-                vertices.add(vertex);
+                vertexMap.put(vertex.getId(), vertex);
             }
 
             workbook.close();
             inputStream.close();
         } catch (IOException ex) {
             Logger.getLogger("discovery").log(Level.SEVERE, "An Exception occurred while reading vertices data: " + ex);
+            System.exit(1);
         }
-        return vertices;
+        return vertexMap;
     }
 
-    public List<Edge> readEdges() {
-        List<Edge> edges = new ArrayList<>();
+    public List<EdgeModel> readEdges() {
+        List<EdgeModel> edges = new ArrayList<>();
         try {
             FileInputStream inputStream = new FileInputStream(this.file);
 
@@ -82,7 +80,6 @@ public class XLSXHandler {
             XSSFSheet firstSheet = workbook.getSheetAt(1);
             Iterator<Row> iterator = firstSheet.iterator();
 
-            int recordId = 1;
             while (iterator.hasNext()) {
                 Row nextRow = iterator.next();
                 // skip header
@@ -90,14 +87,13 @@ public class XLSXHandler {
                     continue;
                 }
                 Iterator<Cell> cellIterator = nextRow.cellIterator();
-                Edge edge = new Edge();
-                edge.setRecordId(recordId);
+                EdgeModel edge = new EdgeModel();
                 while (cellIterator.hasNext()) {
                     Cell cell = cellIterator.next();
                     int columnIndex = cell.getColumnIndex();
                     switch (columnIndex + 1) {
                         case 1:
-                            edge.setEdgeId(String.valueOf((int) cell.getNumericCellValue()));
+                            edge.setId(String.valueOf((int) cell.getNumericCellValue()));
                             break;
                         case 2:
                             edge.setSource(cell.getStringCellValue());
@@ -106,25 +102,25 @@ public class XLSXHandler {
                             edge.setDestination(cell.getStringCellValue());
                             break;
                         case 4:
-                            edge.setDistance((float) cell.getNumericCellValue());
+                            edge.setWeight((float) cell.getNumericCellValue());
                             break;
                     }
                 }
 
                 edges.add(edge);
-                recordId = recordId + 1;
             }
 
             workbook.close();
             inputStream.close();
         } catch (IOException ex) {
             Logger.getLogger("discovery").log(Level.SEVERE, "An Exception occurred while reading edges data: " + ex);
+            System.exit(1);
         }
         return edges;
     }
 
-    public List<Traffic> readTraffics() {
-        List<Traffic> traffics = new ArrayList<>();
+    public List<TrafficModel> readTraffics() {
+        List<TrafficModel> traffics = new ArrayList<>();
         try {
             FileInputStream inputStream = new FileInputStream(this.file);
 
@@ -139,14 +135,14 @@ public class XLSXHandler {
                     continue;
                 }
                 Iterator<Cell> cellIterator = nextRow.cellIterator();
-                Traffic traffic = new Traffic();
+                TrafficModel traffic = new TrafficModel();
 
                 while (cellIterator.hasNext()) {
                     Cell cell = cellIterator.next();
                     int columnIndex = cell.getColumnIndex();
                     switch (columnIndex + 1) {
                         case 1:
-                            traffic.setRouteId(String.valueOf((int) cell.getNumericCellValue()));
+                            traffic.setId(String.valueOf((int) cell.getNumericCellValue()));
                             break;
                         case 2:
                             traffic.setSource((String) getCellValue(cell));
@@ -155,7 +151,7 @@ public class XLSXHandler {
                             traffic.setDestination((String) getCellValue(cell));
                             break;
                         case 4:
-                            traffic.setDelay((float) cell.getNumericCellValue());
+                            traffic.setWeight((float) cell.getNumericCellValue());
                             break;
                     }
                 }
@@ -166,6 +162,7 @@ public class XLSXHandler {
             inputStream.close();
         } catch (IOException ex) {
             Logger.getLogger("discovery").log(Level.SEVERE, "An Exception occurred while reading traffics data: " + ex);
+            System.exit(1);
         }
 
         return traffics;

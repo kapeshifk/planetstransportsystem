@@ -51,7 +51,7 @@ public class PersistenceBean {
         Properties properties = new Properties();
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.DerbyTenSevenDialect");
         properties.setProperty("hibernate.show_sql", "false");
-        properties.setProperty("hibernate.hbm2ddl.auto", "create");
+        properties.setProperty("hibernate.hbm2ddl.auto", "create-drop");
 
         return properties;
     }

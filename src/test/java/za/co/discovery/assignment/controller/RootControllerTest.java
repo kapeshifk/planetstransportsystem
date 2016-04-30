@@ -1,3 +1,4 @@
+/*
 package za.co.discovery.assignment.controller;
 
 import org.junit.Before;
@@ -31,9 +32,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
+*/
 /**
  * Created by Kapeshi.Kongolo on 2016/04/18.
- */
+ *//*
+
 public class RootControllerTest {
     @Mock
     View mockView;
@@ -572,4 +575,4 @@ public class RootControllerTest {
         return viewResolver;
     }
 
-}
+}*/

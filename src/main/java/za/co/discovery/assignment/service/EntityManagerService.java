@@ -9,63 +9,63 @@ import za.co.discovery.assignment.entity.Edge;
 import za.co.discovery.assignment.entity.Traffic;
 import za.co.discovery.assignment.entity.Vertex;
 import za.co.discovery.assignment.helper.Graph;
+import za.co.discovery.assignment.helper.GraphMapper;
+import za.co.discovery.assignment.model.EdgeModel;
+import za.co.discovery.assignment.model.TrafficModel;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Kapeshi.Kongolo on 2016/04/10.
  */
 @Service
 public class EntityManagerService {
-    private static final String EXCEL_FILENAME = "/interstellar.xlsx";
     private VertexDao vertexDao;
     private EdgeDao edgeDao;
     private TrafficDao trafficDao;
+    private XLSXHandler excelHandler;
 
     @Autowired
-    public EntityManagerService(VertexDao vertexDao, EdgeDao edgeDao, TrafficDao trafficDao) {
+    public EntityManagerService(VertexDao vertexDao, EdgeDao edgeDao, TrafficDao trafficDao, XLSXHandler excelHandler) {
         this.vertexDao = vertexDao;
         this.edgeDao = edgeDao;
         this.trafficDao = trafficDao;
+        this.excelHandler = excelHandler;
     }
 
-    public void persistGraph() {
-        URL resource = getClass().getResource(EXCEL_FILENAME);
-        File file1;
-        try {
-            file1 = new File(resource.toURI());
-            persistGraph(file1);
-        } catch (URISyntaxException e) {
-            //tell user on command you can start server, stop
-            //e.printStackTrace();
+    public void readExcelFileAndImportIntoDatabase() {
+        Map<String, Edge> edgeMap = new LinkedHashMap();
+
+        Map<String, Vertex> vertexMap = new LinkedHashMap<>(excelHandler.readVertexes());
+        List<EdgeModel> edges = new ArrayList<>(excelHandler.readEdges());
+        List<TrafficModel> traffics = new ArrayList<>(excelHandler.readTraffics());
+
+        for (EdgeModel edgeModel : edges) {
+            GraphMapper mapper = new GraphMapper(vertexMap, edgeModel);
+            if (mapper.getSource() != null && mapper.getDestination() != null) {
+                Edge edge = new Edge(mapper.createHumanReadableId(edgeModel.getSource(), edgeModel.getDestination()), edgeModel.getWeight());
+                mapper.getSource().addSourceEdges(edge);
+                mapper.getDestination().addDestinationEdges(edge);
+                edgeMap.put(mapper.createHumanReadableId(edgeModel.getSource(), edgeModel.getDestination()), edge);
+            }
+        }
+
+        for (TrafficModel trafficModel : traffics) {
+            GraphMapper mapper = new GraphMapper(edgeMap, trafficModel);
+            if (mapper.getEdge() != null) {
+                Traffic traffic = new Traffic(mapper.createHumanReadableId(trafficModel.getSource(), trafficModel.getDestination()), trafficModel.getWeight());
+                mapper.getEdge().addTraffic(traffic);
+            }
+        }
+
+        for (Vertex vertex : vertexMap.values()) {
+            vertexDao.save(vertex);
         }
     }
 
-    public void persistGraph(File file) {
-        XLSXHandler handler = new XLSXHandler(file);
-
-        List<Vertex> vertices = handler.readVertexes();
-        if (vertices != null && !vertices.isEmpty()) {
-            for (Vertex v : vertices) {
-                vertexDao.save(v);
-            }
-        }
-        List<Edge> edges = handler.readEdges();
-        if (edges != null && !edges.isEmpty()) {
-            for (Edge e : edges) {
-                edgeDao.save(e);
-            }
-        }
-        List<Traffic> traffic = handler.readTraffics();
-        if (edges != null && !edges.isEmpty()) {
-            for (Traffic t : traffic) {
-                trafficDao.save(t);
-            }
-        }
-    }
 
     public Graph selectGraph() {
         List<Vertex> vertices = vertexDao.selectAll();
@@ -117,8 +117,8 @@ public class EntityManagerService {
         return edge;
     }
 
-    public boolean deleteEdge(long recordId) {
-        edgeDao.delete(recordId);
+    public boolean deleteEdge(long id) {
+        edgeDao.delete(id);
         return true;
     }
 
@@ -126,12 +126,12 @@ public class EntityManagerService {
         return edgeDao.selectAll();
     }
 
-    public Edge getEdgeById(long recordId) {
-        return edgeDao.selectUnique(recordId);
+    public List<Edge> getAllUnusedEdges() {
+        return edgeDao.selectAllUnusedEdges();
     }
 
-    public long getEdgeMaxRecordId() {
-        return edgeDao.selectMaxRecordId();
+    public Edge getEdgeById(Long id) {
+        return edgeDao.selectUnique(id);
     }
 
     public boolean edgeExists(Edge edge) {
@@ -141,6 +141,7 @@ public class EntityManagerService {
 
     public Traffic saveTraffic(Traffic traffic) {
         trafficDao.save(traffic);
+        System.out.println("SAVE WORKED");
         return traffic;
     }
 
@@ -149,25 +150,16 @@ public class EntityManagerService {
         return traffic;
     }
 
-    public boolean deleteTraffic(String routeId) {
-        trafficDao.delete(routeId);
+    public boolean deleteTraffic(Long id) {
+        trafficDao.delete(id);
         return true;
     }
 
     public List<Traffic> getAllTraffics() {
-        return trafficDao.selectAll();
+        return trafficDao.selectAllLazyLoading();
     }
 
-    public Traffic getTrafficById(String routeId) {
-        return trafficDao.selectUnique(routeId);
-    }
-
-    public long getTrafficMaxRecordId() {
-        return trafficDao.selectMaxRecordId();
-    }
-
-    public boolean trafficExists(Traffic traffic) {
-        List<Traffic> traffics = trafficDao.trafficExists(traffic);
-        return !traffics.isEmpty();
+    public Traffic getTrafficById(Long id) {
+        return trafficDao.selectUnique(id);
     }
 }

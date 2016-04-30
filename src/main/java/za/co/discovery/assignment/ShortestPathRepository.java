@@ -26,7 +26,6 @@ public class ShortestPathRepository {
     private static final String NO_PLANET_FOUND = "No planet found.";
     private static final String PLANET_DOES_NOT_EXIST = " does not exist in the Interstellar Transport System.";
     protected PlatformTransactionManager platformTransactionManager;
-    private Graph graph;
     private EntityManagerService entityManagerService;
 
     @Autowired
@@ -42,14 +41,14 @@ public class ShortestPathRepository {
         tmpl.execute(new TransactionCallbackWithoutResult() {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
-                entityManagerService.persistGraph();
+                entityManagerService.readExcelFileAndImportIntoDatabase();
             }
         });
     }
 
     public String getShortestPath(String name) {
         StringBuilder path = new StringBuilder();
-        graph = entityManagerService.selectGraph();
+        Graph graph = entityManagerService.selectGraph();
         ShortestPathService sp = new ShortestPathService(graph);
 
         if (graph == null || graph.getVertexes() == null || graph.getVertexes().isEmpty()) {
@@ -62,7 +61,7 @@ public class ShortestPathRepository {
             if (destination == null) {
                 return name + PLANET_DOES_NOT_EXIST;
             }
-        } else if (source != null && destination != null && source.getVertexId().equals(destination.getVertexId())) {
+        } else if (source != null && destination != null && source.getId().equals(destination.getId())) {
             return PATH_NOT_NEEDED + source.getName() + ".";
         }
 
@@ -70,7 +69,7 @@ public class ShortestPathRepository {
         LinkedList<Vertex> paths = sp.getPath(destination);
         if (paths != null) {
             for (Vertex v : paths) {
-                path.append(v.getName() + " (" + v.getVertexId() + ")");
+                path.append(v.getName() + " (" + v.getId() + ")");
                 path.append("\t");
             }
         } else {

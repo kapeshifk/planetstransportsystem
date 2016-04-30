@@ -14,12 +14,15 @@ import org.springframework.transaction.annotation.Transactional;
 import za.co.discovery.assignment.config.DatasourceBean;
 import za.co.discovery.assignment.config.PersistenceBean;
 import za.co.discovery.assignment.entity.Edge;
+import za.co.discovery.assignment.entity.Traffic;
+import za.co.discovery.assignment.entity.Vertex;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 
 
@@ -28,14 +31,17 @@ import static org.junit.Assert.assertEquals;
  */
 @Transactional
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {Edge.class, EdgeDao.class, DatasourceBean.class, PersistenceBean.class},
+@ContextConfiguration(classes = {Edge.class, EdgeDao.class, Vertex.class, VertexDao.class, DatasourceBean.class, PersistenceBean.class},
         loader = AnnotationConfigContextLoader.class)
 
 public class EdgeDaoTest {
 
+    private static final String QUERY_FOR_TABLE_NAMES =
+            "SELECT [name] FROM sys.tables WHERE [type] = 'U' AND [name] LIKE 'tbl_%'";
     @Autowired
     private SessionFactory sessionFactory;
     private EdgeDao edgeDao;
+    private int nextEdgeRecordId;
 
     @Before
     public void setUp() throws Exception {
@@ -46,16 +52,114 @@ public class EdgeDaoTest {
     public void verifyThatSaveEdgeIsCorrect() throws Exception {
         //Set
         Session session = sessionFactory.getCurrentSession();
-        Edge edge = new Edge(1, "2", "SAVE A", "SAVE B", 2f);
-        Edge expectedEdge = new Edge(1, "2", "SAVE A", "SAVE B", 2f);
+        setUpFixtures();
+        Vertex vertex1 = new Vertex("A", "Earth");
+        Vertex vertex2 = new Vertex("B", "Mars");
+        session.save(vertex1);
+        session.save(vertex2);
+
+        Edge edge = new Edge("2", vertex1, vertex2, 2f);
+        Edge expectedEdge = new Edge("2", vertex1, vertex2, 2f);
+        expectedEdge.setId(1L + nextEdgeRecordId);
 
         //Test
         edgeDao.save(edge);
-        Edge persistedEdge = edgeDao.selectUnique(expectedEdge.getRecordId());
+
+        Edge persistedEdge = edgeDao.selectUnique(expectedEdge.getId());
 
         //Verify
         assertThat(persistedEdge, sameBeanAs(expectedEdge));
-        assertEquals("SAVE A", edge.getSource());
+        assertEquals("Earth", edge.getSource().getName());
+        //Rollback for testing purpose
+        session.getTransaction().rollback();
+    }
+
+    @Test
+    public void verifyThatSaveEdgeAlsoSaveTraffic() throws Exception {
+        //Set
+        Session session = sessionFactory.getCurrentSession();
+        setUpFixtures();
+        Vertex vertex1 = new Vertex("A", "Earth");
+        Vertex vertex2 = new Vertex("B", "Mars");
+        session.save(vertex1);
+        session.save(vertex2);
+
+        Edge edge = new Edge("2", vertex1, vertex2, 2f);
+
+        Traffic traffic = new Traffic("2", 1f);
+        edge.addTraffic(traffic);
+
+
+        //Test
+        edgeDao.save(edge);
+
+        Edge expectedEdge = new Edge("2", vertex1, vertex2, 2f);
+        expectedEdge.setId(1L + nextEdgeRecordId);
+        Traffic expectedTraffic = new Traffic("2", 1f);
+        expectedTraffic.setId(2L);
+        expectedEdge.addTraffic(expectedTraffic);
+
+        List<Traffic> expectedTraffics = singletonList(expectedTraffic);
+
+        Criteria criteria = session.createCriteria(Traffic.class);
+        List<Traffic> actualTraffics = (List<Traffic>) criteria.list();
+
+        //Verify
+        assertThat(actualTraffics, sameBeanAs(expectedTraffics));
+        //Rollback for testing purpose
+        session.getTransaction().rollback();
+    }
+
+    @Test
+    public void verifyThatSaveVertexAlsoSaveEdgeAndTraffic() throws Exception {
+        //Set
+        Session session = sessionFactory.getCurrentSession();
+        setUpFixtures();
+        Vertex vertex1 = new Vertex("A", "Earth");
+        Vertex vertex2 = new Vertex("B", "Mars");
+
+        Edge edge = new Edge("2", 2f);
+
+        vertex1.addSourceEdges(edge);
+        vertex2.addDestinationEdges(edge);
+
+        Traffic traffic = new Traffic("2", 1f);
+        edge.addTraffic(traffic);
+
+        //Test
+        session.save(vertex1);
+        session.save(vertex2);
+
+        Vertex expectedVertex1 = new Vertex("A", "Earth");
+        Vertex expectedVertex2 = new Vertex("B", "Mars");
+
+        Edge expectedEdge = new Edge("2", 2f);
+        expectedEdge.setId(1L + nextEdgeRecordId);
+        expectedVertex1.addSourceEdges(expectedEdge);
+        expectedVertex2.addDestinationEdges(expectedEdge);
+
+        Traffic expectedTraffic = new Traffic("2", 1f);
+        expectedTraffic.setId(1L);
+        expectedEdge.addTraffic(expectedTraffic);
+
+        List<Edge> expectedEdges = singletonList(expectedEdge);
+        List<Traffic> expectedTraffics = singletonList(expectedTraffic);
+
+        Criteria criteriaTraffic = session.createCriteria(Traffic.class);
+        List<Traffic> actualTraffics = (List<Traffic>) criteriaTraffic.list();
+
+        Criteria criteriaEdge = session.createCriteria(Edge.class);
+        List<Edge> actualEdges = (List<Edge>) criteriaEdge.list();
+
+        Traffic t = actualTraffics.get(0);
+        System.out.println(t.getRoute().getSource().getName());
+        System.out.println(t.getRoute().getDestination().getName());
+
+        Edge e = actualEdges.get(0);
+
+        //Verify
+        assertThat(actualTraffics, sameBeanAs(expectedTraffics));
+        assertThat(actualEdges, sameBeanAs(expectedEdges));
         //Rollback for testing purpose
         session.getTransaction().rollback();
     }
@@ -64,20 +168,27 @@ public class EdgeDaoTest {
     public void verifyThatUpdateEdgeIsCorrect() throws Exception {
         //Set
         Session session = sessionFactory.getCurrentSession();
-        Edge edge = new Edge(1, "2", "UPDATE A", "UPDATE B", 20f);
+        setUpFixtures();
+        Vertex vertex1 = new Vertex("A", "Earth");
+        Vertex vertex2 = new Vertex("B", "Mars");
+        session.save(vertex1);
+        session.save(vertex2);
+        Edge edge = new Edge("20", vertex1, vertex2, 20f);
         session.save(edge);
 
-        Edge expectedEdge = new Edge(1, "2", "UPDATED A", "UPDATED B", 20f);
-        List<Edge> expectedEdges = new ArrayList<>();
-        expectedEdges.add(expectedEdge);
+        Vertex vertex3 = new Vertex("C", "Moon");
+        session.save(vertex3);
+        Edge expectedEdge = new Edge("20", vertex1, vertex3, 20f);
+        expectedEdge.setId(nextEdgeRecordId + 1L);
+        List<Edge> expectedEdges = singletonList(expectedEdge);
 
         //Test
         edgeDao.update(expectedEdge);
-        List<Edge> persistedEdges = edgeDao.selectAllByRecordId(expectedEdge.getRecordId());
+        List<Edge> persistedEdges = edgeDao.selectAllByRecordId(expectedEdge.getId());
 
         // Verify
         assertThat(persistedEdges, sameBeanAs(expectedEdges));
-
+        assertEquals("Moon", edge.getDestination().getName());
         //Rollback for testing purpose
         session.getTransaction().rollback();
     }
@@ -86,15 +197,28 @@ public class EdgeDaoTest {
     public void verifyThatDeleteEdgeIsCorrect() throws Exception {
         //Set
         Session session = sessionFactory.getCurrentSession();
-        Edge e1 = new Edge(2, "30", "DELETE A", "DELETE B", 0.17f);
-        Edge e2 = new Edge(3, "19", "DELETE C", "DELETE D", 0.19f);
+        setUpFixtures();
+        Vertex vertex1 = new Vertex("A", "Earth");
+        Vertex vertex2 = new Vertex("B", "Mars");
+        Vertex vertex3 = new Vertex("C", "Moon");
+        Vertex vertex4 = new Vertex("D", "Jupiter");
+        session.save(vertex1);
+        session.save(vertex2);
+        session.save(vertex3);
+        session.save(vertex4);
+
+        Edge e1 = new Edge("10", vertex1, vertex2, 20.1f);
+        Edge e2 = new Edge("12", vertex3, vertex4, 1.3f);
         session.save(e1);
         session.save(e2);
-        List<Edge> expectedEdges = new ArrayList<>();
-        expectedEdges.add(new Edge(2, "30", "DELETE A", "DELETE B", 0.17f));
+
+
+        Edge exp = new Edge("10", vertex1, vertex2, 20.1f);
+        exp.setId(1L + nextEdgeRecordId);
+        List<Edge> expectedEdges = singletonList(exp);
 
         //Test
-        edgeDao.delete(e2.getRecordId());
+        edgeDao.delete(e2.getId());
         Criteria criteria = session.createCriteria(Edge.class);
         List<Edge> persistedEdges = (List<Edge>) criteria.list();
 
@@ -108,34 +232,45 @@ public class EdgeDaoTest {
     public void verifyThatSelectUniqueEdgeIsCorrect() {
         //Set
         Session session = sessionFactory.getCurrentSession();
-        Edge edge = new Edge(8, "5", "UNIQUE A", "UNIQUE B", 0.5f);
-        Edge expectedEdge = new Edge(9, "7", "UNIQUE C", "UNIQUE D", 0.7f);
+        Vertex vertex1 = new Vertex("A", "Earth");
+        Vertex vertex2 = new Vertex("B", "Mars");
+        session.save(vertex1);
+        session.save(vertex2);
+
+        Edge edge = new Edge("5", vertex1, vertex2, 0.5f);
+        Edge expectedEdge = new Edge("1", vertex1, vertex2, 20.1f);
+        expectedEdge.setId(1L);
         session.save(edge);
         session.save(expectedEdge);
 
         //Test
-        Edge persistedEdge = edgeDao.selectUnique(expectedEdge.getRecordId());
+        Edge persistedEdge = edgeDao.selectUnique(expectedEdge.getId());
 
         //Verify
         assertThat(persistedEdge, sameBeanAs(expectedEdge));
+        assertEquals(expectedEdge, persistedEdge);
         //Rollback for testing purpose
         session.getTransaction().rollback();
     }
 
     @Test
-    public void verifyThatSelectAllEdgesByIdIsCorrect() {
+    public void verifyThatSelectAllEdgesByRouteIdIsCorrect() {
         //Set
         Session session = sessionFactory.getCurrentSession();
-        Edge e1 = new Edge(2, "30", "EDGE K", "EDGE F", 0.17f);
-        Edge e2 = new Edge(3, "30", "EDGE C", "EDGE D", 0.19f);
+        Vertex vertex1 = new Vertex("A", "Earth");
+        Vertex vertex2 = new Vertex("B", "Mars");
+        session.save(vertex1);
+        session.save(vertex2);
+
+        Edge e1 = new Edge("1", vertex1, vertex2, 2.4f);
+        Edge e2 = new Edge("2", vertex2, vertex1, 1.3f);
         session.save(e1);
         session.save(e2);
-        List<Edge> expectedEdges = new ArrayList<>();
-        expectedEdges.add(e1);
-        expectedEdges.add(e2);
+
+        List<Edge> expectedEdges = singletonList(e1);
 
         //Test
-        List<Edge> persistedEdge = edgeDao.selectAllByEdgeId(e1.getEdgeId());
+        List<Edge> persistedEdge = edgeDao.selectAllByRouteId(e1.getRouteId());
 
         //Verify
         assertThat(persistedEdge, sameBeanAs(expectedEdges));
@@ -147,13 +282,23 @@ public class EdgeDaoTest {
     public void verifyThatSelectAllEdgesIsCorrect() {
         //Set
         Session session = sessionFactory.getCurrentSession();
-        Edge e1 = new Edge(2, "30", "ALL K", "ALL F", 0.17f);
-        Edge e2 = new Edge(3, "19", "ALL C", "ALL D", 0.19f);
-        session.save(e1);
-        session.save(e2);
-        List<Edge> expectedEdges = new ArrayList<>();
-        expectedEdges.add(e1);
-        expectedEdges.add(e2);
+        Vertex vertex1 = new Vertex("A", "Earth");
+        Vertex vertex2 = new Vertex("B", "Mars");
+
+
+        Edge e1 = new Edge("4", 2.4f);
+        Edge e2 = new Edge("9", 1.3f);
+
+        vertex1.addSourceEdges(e1);
+        vertex1.addDestinationEdges(e2);
+        vertex2.addDestinationEdges(e1);
+        vertex2.addSourceEdges(e2);
+
+
+        session.save(vertex1);
+        session.save(vertex2);
+
+        List<Edge> expectedEdges = Arrays.asList(e2, e1);
 
         //Test
         List<Edge> persistedEdge = edgeDao.selectAll();
@@ -161,25 +306,7 @@ public class EdgeDaoTest {
         //Verify
         assertThat(persistedEdge, sameBeanAs(expectedEdges));
         //Rollback for testing purpose
-        session.getTransaction().rollback();
-    }
 
-    @Test
-    public void verifyThatSelectEdgeMaxRecordIsCorrect() {
-        //Set
-        Session session = sessionFactory.getCurrentSession();
-        Edge e1 = new Edge(1, "30", "ALL K", "ALL F", 0.17f);
-        Edge e2 = new Edge(2, "19", "ALL C", "ALL D", 0.19f);
-        session.save(e1);
-        session.save(e2);
-        long expectedMax = 2;
-
-        //Test
-        long returnMax = edgeDao.selectMaxRecordId();
-
-        //Verify
-        assertThat(returnMax, sameBeanAs(expectedMax));
-        //Rollback for testing purpose
         session.getTransaction().rollback();
     }
 
@@ -187,14 +314,21 @@ public class EdgeDaoTest {
     public void verifyThatEdgeExistsSelectionIsCorrect() {
         //Set
         Session session = sessionFactory.getCurrentSession();
-        Edge e1 = new Edge(1, "1", "A", "B", 0.17f);
-        Edge e2 = new Edge(2, "2", "A", "C", 0.19f);
+        Vertex vertex1 = new Vertex("A", "Earth");
+        Vertex vertex2 = new Vertex("B", "Mars");
+        Vertex vertex3 = new Vertex("C", "Moon");
+        session.save(vertex1);
+        session.save(vertex2);
+        session.save(vertex3);
+
+        Edge e1 = new Edge("1", vertex1, vertex2, 2.4f);
+        Edge e2 = new Edge("2", vertex1, vertex3, 100.3f);
         session.save(e1);
         session.save(e2);
 
-        Edge edgeToCommit = new Edge(3, "3", "A", "C", 3.0f);
-        List<Edge> expectedEdges = new ArrayList<>();
-        expectedEdges.add(e2);
+        Edge edgeToCommit = new Edge("3", vertex1, vertex2, 0.3f);
+        edgeToCommit.setId(3L);
+        List<Edge> expectedEdges = singletonList(e1);
 
         //Test
         List<Edge> returnedEdges = edgeDao.edgeExists(edgeToCommit);
@@ -204,5 +338,7 @@ public class EdgeDaoTest {
         session.getTransaction().rollback();
     }
 
-
+    public void setUpFixtures() {
+        nextEdgeRecordId = edgeDao.findNextId();
+    }
 }

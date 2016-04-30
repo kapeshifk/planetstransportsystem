@@ -13,6 +13,7 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.transaction.annotation.Transactional;
 import za.co.discovery.assignment.config.DatasourceBean;
 import za.co.discovery.assignment.config.PersistenceBean;
+import za.co.discovery.assignment.entity.Edge;
 import za.co.discovery.assignment.entity.Vertex;
 
 import java.util.ArrayList;
@@ -20,6 +21,9 @@ import java.util.List;
 
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
+import static java.util.Collections.singletonList;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 
 
@@ -28,7 +32,7 @@ import static org.junit.Assert.assertEquals;
  */
 @Transactional
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {Vertex.class, VertexDao.class, DatasourceBean.class, PersistenceBean.class},
+@ContextConfiguration(classes = {Edge.class, EdgeDao.class, Vertex.class, VertexDao.class, DatasourceBean.class, PersistenceBean.class},
         loader = AnnotationConfigContextLoader.class)
 public class VertexDaoTest {
     @Autowired
@@ -85,23 +89,112 @@ public class VertexDaoTest {
     }
 
     @Test
-    public void verifyThatDeleteVertexIsCorrect() throws Exception {
+    public void verifyThatUpdateVertexAlsoUpdateEdges() throws Exception {
         //Set
         Session session = sessionFactory.getCurrentSession();
-        Vertex v1 = new Vertex("A", "Mars");
-        Vertex v2 = new Vertex("C", "Terre");
+        Vertex vertex = new Vertex("A", "Earth");
+        session.save(vertex);
+
+        Vertex vertexToUpdate = new Vertex("A", "Jupiter");
+
+        Vertex vertex2 = new Vertex("B", "Moon");
+        session.save(vertex2);
+
         List<Vertex> expectedVertexes = new ArrayList<>();
-        expectedVertexes.add(v1);
-        session.save(v1);
-        session.save(v2);
+        expectedVertexes.add(vertexToUpdate);
+        expectedVertexes.add(vertex2);
+
+        Edge edge = new Edge("2", 20f);
+
+        vertex.addSourceEdges(edge);
+        vertex2.addDestinationEdges(edge);
 
         //Test
-        vertexDao.delete(v2.getVertexId());
+        vertexDao.update(vertexToUpdate);
         Criteria criteria = session.createCriteria(Vertex.class);
         List<Vertex> persistedVertexes = (List<Vertex>) criteria.list();
 
         // Verify
         assertThat(persistedVertexes, sameBeanAs(expectedVertexes));
+        assertEquals("Jupiter", edge.getSource().getName());
+
+        //Rollback for testing purpose
+        session.getTransaction().rollback();
+    }
+
+    @Test
+    public void verifyThatDeleteVertexIsCorrect() throws Exception {
+        //Set
+        Session session = sessionFactory.getCurrentSession();
+        Vertex v1 = new Vertex("A", "Mars");
+        Vertex v2 = new Vertex("C", "Terre");
+        List<Vertex> expectedVertexes = singletonList(v1);
+        session.save(v1);
+        session.save(v2);
+
+        //Test
+        vertexDao.delete(v2.getId());
+        Criteria criteria = session.createCriteria(Vertex.class);
+        List<Vertex> persistedVertexes = (List<Vertex>) criteria.list();
+
+        // Verify
+        assertThat(persistedVertexes, sameBeanAs(expectedVertexes));
+
+        //Rollback for testing purpose
+        session.getTransaction().rollback();
+    }
+
+    @Test
+    public void verifyThatDeleteVertexAlsoDeleteEdges() throws Exception {
+        //Set
+        Session session = sessionFactory.getCurrentSession();
+        Vertex v1 = new Vertex("A", "Earth");
+        Vertex v2 = new Vertex("C", "Mars");
+
+        Edge edge1 = new Edge("2", 20f);
+
+        v1.addSourceEdges(edge1);
+        v2.addDestinationEdges(edge1);
+
+        session.save(v1);
+        session.save(v2);
+
+        List<Vertex> expectedVertexes = singletonList(v2);
+
+        //Test
+        v1.removeSourceEdges(edge1);
+        v2.removeDestinationEdges(edge1);
+        vertexDao.delete(v1.getId());
+
+        /*Criteria allEdges1 = session.createCriteria(Edge.class);
+        List<Edge> edgeList = (List<Edge>) allEdges1.list();
+
+        for (Edge edgeInList : edgeList) {
+            Vertex vertexSource = edgeInList.getSource();
+            if(vertexSource !=null && vertexSource.equals(v1)){
+                vertexSource.removeSourceEdges(edgeInList);
+                Vertex vertexDestination = edgeInList.getDestination();
+                vertexDestination.removeDestinationEdges(edgeInList);
+            }
+
+            Vertex vertexDestination = edgeInList.getDestination();
+            if(vertexDestination!=null && vertexDestination.equals(v1)){
+                vertexDestination.removeDestinationEdges(edgeInList);
+                Vertex source = edgeInList.getSource();
+                source.removeSourceEdges(edgeInList);
+            }
+        }
+        session.delete(v1);*/
+
+        Criteria allVertices = session.createCriteria(Vertex.class);
+        List<Vertex> persistedVertexes = (List<Vertex>) allVertices.list();
+
+        Criteria allEdges = session.createCriteria(Edge.class);
+        List<Edge> edges = (List<Edge>) allEdges.list();
+
+        // Verify
+        assertThat(persistedVertexes, sameBeanAs(expectedVertexes));
+        assertThat(edges, is(empty()));
 
         //Rollback for testing purpose
         session.getTransaction().rollback();
@@ -117,7 +210,7 @@ public class VertexDaoTest {
         session.save(expected);
 
         //Test
-        Vertex actualVertex = vertexDao.selectUnique(expected.getVertexId());
+        Vertex actualVertex = vertexDao.selectUnique(expected.getId());
 
         //Verify
         assertThat(actualVertex, sameBeanAs(expected));

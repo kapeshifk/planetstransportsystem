@@ -6,7 +6,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.Formatter;
+import org.springframework.format.support.FormattingConversionService;
+import org.springframework.format.support.FormattingConversionServiceFactoryBean;
 import org.springframework.web.client.RestTemplate;
+import za.co.discovery.assignment.format.EdgeFormatter;
+import za.co.discovery.assignment.format.TrafficFormatter;
+import za.co.discovery.assignment.format.VertexFormatter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 @SpringBootApplication
@@ -22,6 +31,22 @@ public class InterstellarTransportSystemApplication {
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
+    }
+
+    @Bean(name = "conversionService")
+    public FormattingConversionService conversionService() {
+        FormattingConversionServiceFactoryBean bean = new FormattingConversionServiceFactoryBean();
+        bean.setRegisterDefaultFormatters(false);
+        bean.setFormatters(getFormatters());
+        return bean.getObject();
+    }
+
+    private Set<Formatter> getFormatters() {
+        Set<Formatter> converters = new HashSet<>();
+        converters.add(new VertexFormatter());
+        converters.add(new EdgeFormatter());
+        converters.add(new TrafficFormatter());
+        return converters;
     }
 
 }

@@ -89,24 +89,11 @@ public class ShortestPathService {
     private List<Vertex> getNeighbors(Vertex currentVertex) {
         List<Vertex> neighbors = new ArrayList<>();
         for (Edge edge : edges) {
-            Vertex destination = fromId(edge.getDestination());
-            if (edge.getSource().equals(currentVertex.getVertexId()) && !isVisited(destination)) {
-                neighbors.add(destination);
+            if (edge.getSource().equals(currentVertex) && !isVisited(edge.getDestination())) {
+                neighbors.add(edge.getDestination());
             }
         }
         return neighbors;
-    }
-
-    public Vertex fromId(final String str) {
-        for (Vertex v : vertices) {
-            if (v.getVertexId().equalsIgnoreCase(str)) {
-                return v;
-            }
-        }
-        Vertex islandVertex = new Vertex();
-        islandVertex.setVertexId(str);
-        islandVertex.setName("Island " + str);
-        return islandVertex;
     }
 
     private boolean isVisited(Vertex vertex) {
@@ -124,8 +111,8 @@ public class ShortestPathService {
 
     private float getDistance(Vertex source, Vertex target) {
         for (Edge edge : edges) {
-            if (edge.getSource().equals(source.getVertexId()) && edge.getDestination().equals(target.getVertexId())) {
-                return edge.getDistance() + edge.getTimeDelay();
+            if (edge.getSource().equals(source) && edge.getDestination().equals(target)) {
+                return edge.getDistance();
             }
         }
         throw new RuntimeException("Error: Something went wrong!");

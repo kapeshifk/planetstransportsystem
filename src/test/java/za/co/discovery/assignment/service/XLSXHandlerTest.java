@@ -1,15 +1,20 @@
 package za.co.discovery.assignment.service;
 
-import org.junit.Before;
 import org.junit.Test;
-import za.co.discovery.assignment.entity.Edge;
-import za.co.discovery.assignment.entity.Traffic;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
+import za.co.discovery.assignment.config.ResourceBean;
 import za.co.discovery.assignment.entity.Vertex;
+import za.co.discovery.assignment.model.EdgeModel;
+import za.co.discovery.assignment.model.TrafficModel;
 
-import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
@@ -17,16 +22,12 @@ import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 /**
  * Created by Kapeshi.Kongolo on 2016/04/13.
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = {XLSXHandler.class, ResourceBean.class},
+        loader = AnnotationConfigContextLoader.class)
 public class XLSXHandlerTest {
-    private static final String EXCEL_FILENAME = "/test.xlsx";
+    @Autowired
     private XLSXHandler xlsxHandler;
-
-    @Before
-    public void setUp() throws Exception {
-        URL resource = getClass().getResource(EXCEL_FILENAME);
-        File file1 = new File(resource.toURI());
-        xlsxHandler = new XLSXHandler(file1);
-    }
 
     @Test
     public void verifyThatReadingVerticesFromFileIsCorrect() throws Exception {
@@ -37,15 +38,15 @@ public class XLSXHandlerTest {
         Vertex vertex4 = new Vertex("D", "Venus");
         Vertex vertex5 = new Vertex("E", "Mars");
 
-        List<Vertex> expectedVertexes = new ArrayList<>();
-        expectedVertexes.add(vertex1);
-        expectedVertexes.add(vertex2);
-        expectedVertexes.add(vertex3);
-        expectedVertexes.add(vertex4);
-        expectedVertexes.add(vertex5);
+        Map<String, Vertex> expectedVertexes = new HashMap<>();
+        expectedVertexes.put(vertex1.getId(), vertex1);
+        expectedVertexes.put(vertex2.getId(), vertex2);
+        expectedVertexes.put(vertex3.getId(), vertex3);
+        expectedVertexes.put(vertex4.getId(), vertex4);
+        expectedVertexes.put(vertex5.getId(), vertex5);
 
         //Test
-        List<Vertex> readVertexes = xlsxHandler.readVertexes();
+        Map<String, Vertex> readVertexes = xlsxHandler.readVertexes();
 
         //Verify
         assertThat(expectedVertexes, sameBeanAs(readVertexes));
@@ -54,13 +55,13 @@ public class XLSXHandlerTest {
     @Test
     public void verifyThatReadingEdgesFromFileIsCorrect() throws Exception {
         //Set
-        Edge edge1 = new Edge(1, "1", "A", "B", 0.44f);
-        Edge edge2 = new Edge(2, "2", "A", "C", 1.89f);
-        Edge edge3 = new Edge(3, "3", "A", "D", 0.10f);
-        Edge edge4 = new Edge(4, "4", "B", "H", 2.44f);
-        Edge edge5 = new Edge(5, "5", "B", "E", 3.45f);
+        EdgeModel edge1 = new EdgeModel("1", "A", "B", 0.44f);
+        EdgeModel edge2 = new EdgeModel("2", "A", "C", 1.89f);
+        EdgeModel edge3 = new EdgeModel("3", "A", "D", 0.10f);
+        EdgeModel edge4 = new EdgeModel("4", "B", "H", 2.44f);
+        EdgeModel edge5 = new EdgeModel("5", "B", "E", 3.45f);
 
-        List<Edge> expectedEdges = new ArrayList<>();
+        List<EdgeModel> expectedEdges = new ArrayList<>();
         expectedEdges.add(edge1);
         expectedEdges.add(edge2);
         expectedEdges.add(edge3);
@@ -68,7 +69,7 @@ public class XLSXHandlerTest {
         expectedEdges.add(edge5);
 
         //Test
-        List<Edge> readEdges = xlsxHandler.readEdges();
+        List<EdgeModel> readEdges = xlsxHandler.readEdges();
 
         //Verify
         assertThat(expectedEdges, sameBeanAs(readEdges));
@@ -77,13 +78,13 @@ public class XLSXHandlerTest {
     @Test
     public void verifyThatReadingTrafficsFromFileIsCorrect() throws Exception {
         //Set
-        Traffic traffic1 = new Traffic("1", "A", "B", 0.30f);
-        Traffic traffic2 = new Traffic("2", "A", "C", 0.90f);
-        Traffic traffic3 = new Traffic("3", "A", "D", 0.10f);
-        Traffic traffic4 = new Traffic("4", "B", "H", 0.20f);
-        Traffic traffic5 = new Traffic("5", "B", "E", 1.30f);
+        TrafficModel traffic1 = new TrafficModel("1", "A", "B", 0.30f);
+        TrafficModel traffic2 = new TrafficModel("2", "A", "C", 0.90f);
+        TrafficModel traffic3 = new TrafficModel("3", "A", "D", 0.10f);
+        TrafficModel traffic4 = new TrafficModel("4", "B", "H", 0.20f);
+        TrafficModel traffic5 = new TrafficModel("5", "B", "E", 1.30f);
 
-        List<Traffic> expectedTraffics = new ArrayList<>();
+        List<TrafficModel> expectedTraffics = new ArrayList<>();
         expectedTraffics.add(traffic1);
         expectedTraffics.add(traffic2);
         expectedTraffics.add(traffic3);
@@ -91,7 +92,7 @@ public class XLSXHandlerTest {
         expectedTraffics.add(traffic5);
 
         //Test
-        List<Traffic> readTraffics = xlsxHandler.readTraffics();
+        List<TrafficModel> readTraffics = xlsxHandler.readTraffics();
 
         //Verify
         assertThat(expectedTraffics, sameBeanAs(readTraffics));

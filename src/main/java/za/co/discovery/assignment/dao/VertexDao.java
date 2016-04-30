@@ -37,19 +37,19 @@ public class VertexDao {
         session.merge(vertex);
     }
 
-    public int delete(String vertexId) {
+    public int delete(String id) {
         Session session = sessionFactory.getCurrentSession();
-        String qry = "DELETE FROM vertex AS V WHERE V.vertexId = :vertexIdParameter";
+        String qry = "DELETE FROM vertex AS V WHERE V.id = :idParameter";
         Query query = session.createQuery(qry);
-        query.setParameter("vertexIdParameter", vertexId);
+        query.setParameter("idParameter", id);
 
         return query.executeUpdate();
     }
 
-    public Vertex selectUnique(String vertexId) {
+    public Vertex selectUnique(String id) {
         Session session = sessionFactory.getCurrentSession();
         Criteria criteria = session.createCriteria(Vertex.class);
-        criteria.add(Restrictions.eq("vertexId", vertexId));
+        criteria.add(Restrictions.eq("id", id));
 
         return (Vertex) criteria.uniqueResult();
     }

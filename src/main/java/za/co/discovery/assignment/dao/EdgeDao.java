@@ -4,7 +4,6 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -38,65 +37,66 @@ public class EdgeDao {
         session.merge(edge);
     }
 
-    public int delete(long recordId) {
+    public int delete(Long id) {
         Session session = sessionFactory.getCurrentSession();
-        String qry = "DELETE FROM edge AS E WHERE E.recordId = :recordIdParameter";
+        String qry = "DELETE FROM edge AS E WHERE E.id = :idParameter";
         Query query = session.createQuery(qry);
-        query.setParameter("recordIdParameter", recordId);
+        query.setParameter("idParameter", id);
 
         return query.executeUpdate();
     }
 
-    public Edge selectUnique(long recordId) {
+    public int findNextId() {
+        Session session = sessionFactory.getCurrentSession();
+        String qry = "values ( next value for EDGE_SEQ )";
+        return (int) session.createSQLQuery(qry).uniqueResult();
+    }
+
+    public Edge selectUnique(Long id) {
         Session session = sessionFactory.getCurrentSession();
         Criteria criteria = session.createCriteria(Edge.class);
-        criteria.add(Restrictions.eq("recordId", recordId));
+        criteria.add(Restrictions.eq("id", id));
 
         return (Edge) criteria.uniqueResult();
     }
 
-    public long selectMaxRecordId() {
-        long maxId = (Long) sessionFactory.getCurrentSession()
-                .createCriteria(Edge.class)
-                .setProjection(Projections.max("recordId")).uniqueResult();
-
-        return maxId;
-    }
-
     public List<Edge> edgeExists(Edge edge) {
         Session session = sessionFactory.getCurrentSession();
-        Criteria criteria = session.createCriteria(Edge.class);
-        criteria.add(Restrictions.ne("recordId", edge.getRecordId()));
-        criteria.add(Restrictions.eq("source", edge.getSource()));
-        criteria.add(Restrictions.eq("destination", edge.getDestination()));
-        List<Edge> edges = (List<Edge>) criteria.list();
+        String hql = "FROM edge AS E WHERE E.source = :source AND E.destination = :destination";
+        Query query = session.createQuery(hql);
+        query.setEntity("source", edge.getSource());
+        query.setEntity("destination", edge.getDestination());
 
-        return edges;
+        return query.list();
     }
 
-    public List<Edge> selectAllByRecordId(long recordId) {
+    public List<Edge> selectAllByRecordId(long id) {
         Session session = sessionFactory.getCurrentSession();
         Criteria criteria = session.createCriteria(Edge.class);
-        criteria.add(Restrictions.eq("recordId", recordId));
-        List<Edge> edges = (List<Edge>) criteria.list();
+        criteria.add(Restrictions.eq("id", id));
 
-        return edges;
+        return criteria.list();
     }
 
-    public List<Edge> selectAllByEdgeId(String edgeId) {
+    public List<Edge> selectAllByRouteId(String routeId) {
         Session session = sessionFactory.getCurrentSession();
         Criteria criteria = session.createCriteria(Edge.class);
-        criteria.add(Restrictions.eq("edgeId", edgeId));
-        List<Edge> edges = (List<Edge>) criteria.list();
+        criteria.add(Restrictions.eq("routeId", routeId));
 
-        return edges;
+        return criteria.list();
     }
 
     public List<Edge> selectAll() {
         Session session = sessionFactory.getCurrentSession();
         Criteria criteria = session.createCriteria(Edge.class);
-        List<Edge> edges = (List<Edge>) criteria.list();
-        return edges;
+        return criteria.list();
+    }
+
+    public List<Edge> selectAllUnusedEdges() {
+        Session session = sessionFactory.getCurrentSession();
+        String hql = "SELECT e FROM edge e LEFT JOIN FETCH e.traffic WHERE e.traffic.id is null";
+        Query query = session.createQuery(hql);
+        return query.list();
     }
 }
 

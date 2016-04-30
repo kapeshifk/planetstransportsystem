@@ -6,61 +6,41 @@ import za.co.discovery.assignment.entity.Traffic;
 import za.co.discovery.assignment.entity.Vertex;
 import za.co.discovery.assignment.helper.Graph;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-/**
- * Created by Kapeshi.Kongolo on 2016/04/14.
- */
+
 public class ShortestPathServiceTest {
 
     @Test
     public void verifyThatShortestPathAlgorithmIsCorrect() throws Exception {
-        Vertex vertex1 = new Vertex("A", "Earth");
-        Vertex vertex2 = new Vertex("B", "Moon");
-        Vertex vertex3 = new Vertex("C", "Jupiter");
-        Vertex vertex4 = new Vertex("D", "Venus");
-        Vertex vertex5 = new Vertex("E", "Mars");
+        Vertex vertexA = new Vertex("A", "Earth");
+        Vertex vertexB = new Vertex("B", "Moon");
+        Vertex vertexC = new Vertex("C", "Jupiter");
+        Vertex vertexD = new Vertex("D", "Venus");
+        Vertex vertexE = new Vertex("E", "Mars");
 
-        List<Vertex> vertices = new ArrayList<>();
-        vertices.add(vertex1);
-        vertices.add(vertex2);
-        vertices.add(vertex3);
-        vertices.add(vertex4);
-        vertices.add(vertex5);
+        List<Vertex> vertices = Arrays.asList(vertexA, vertexB, vertexC, vertexD, vertexE);
 
-        Edge edge1 = new Edge(1, "1", "A", "B", 1.0f);
-        Edge edge2 = new Edge(2, "2", "A", "C", 1.0f);
-        Edge edge3 = new Edge(3, "3", "A", "D", 1.0f);
-        Edge edge4 = new Edge(4, "4", "B", "E", 1.0f);
-        Edge edge5 = new Edge(5, "5", "C", "E", 1.0f);
-        Edge edge6 = new Edge(6, "5", "X", "Y", 1.0f);
+        Edge edge1 = new Edge("1", vertexA, vertexB, 1.0f);
+        Edge edge2 = new Edge("2", vertexA, vertexC, 1.0f);
+        Edge edge3 = new Edge("3", vertexA, vertexD, 1.0f);
+        Edge edge4 = new Edge("4", vertexB, vertexE, 1.0f);
+        Edge edge5 = new Edge("5", vertexC, vertexE, 1.0f);
 
-        List<Edge> edges = new ArrayList<>();
-        edges.add(edge1);
-        edges.add(edge2);
-        edges.add(edge3);
-        edges.add(edge4);
-        edges.add(edge5);
-        edges.add(edge6);
+        List<Edge> edges = Arrays.asList(edge1, edge2, edge3, edge4, edge5);
 
-        Traffic traffic1 = new Traffic("1", "A", "B", 5.0f);
-        Traffic traffic2 = new Traffic("2", "A", "C", 5.0f);
-        Traffic traffic3 = new Traffic("3", "A", "D", 5.0f);
-        Traffic traffic4 = new Traffic("4", "B", "E", 15.0f);
-        Traffic traffic5 = new Traffic("5", "C", "E", 5.0f);
+        Traffic traffic1 = new Traffic("1", edge1, 5.0f);
+        Traffic traffic2 = new Traffic("2", edge2, 5.0f);
+        Traffic traffic3 = new Traffic("3", edge3, 5.0f);
+        Traffic traffic4 = new Traffic("4", edge4, 15.0f);
+        Traffic traffic5 = new Traffic("5", edge5, 5.0f);
 
-        List<Traffic> traffics = new ArrayList<>();
-        traffics.add(traffic1);
-        traffics.add(traffic2);
-        traffics.add(traffic3);
-        traffics.add(traffic4);
-        traffics.add(traffic5);
+        List<Traffic> traffics = Arrays.asList(traffic1, traffic2, traffic3, traffic4, traffic5);
 
         String expectedPath = "A C E ";
         //Test
@@ -77,7 +57,7 @@ public class ShortestPathServiceTest {
         LinkedList<Vertex> paths = dijkstra.getPath(destination);
         if (paths != null) {
             for (Vertex v : paths) {
-                path.append(v.getVertexId());
+                path.append(v.getId());
                 path.append(" ");
             }
         } else {
@@ -86,7 +66,6 @@ public class ShortestPathServiceTest {
 
 
         String actual = path.toString();
-
         assertThat(expectedPath, sameBeanAs(actual));
     }
 }

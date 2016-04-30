@@ -1,5 +1,8 @@
 package za.co.discovery.assignment.model;
 
+import za.co.discovery.assignment.entity.Edge;
+import za.co.discovery.assignment.entity.Vertex;
+
 import java.io.Serializable;
 
 /**
@@ -7,21 +10,22 @@ import java.io.Serializable;
  */
 public class ShortestPathModel implements Serializable {
 
-    private String selectedVertex;
+    private Vertex sourceVertex;
+    private Vertex destinationVertex;
+    private Vertex selectedVertex;
+    private Edge selectedEdge;
     private String selectedVertexName;
     private String vertexId;
     private String vertexName;
     private String thePath;
-    private String sourceVertex;
-    private String destinationVertex;
     private boolean undirectedGraph;
     private boolean trafficAllowed;
 
-    public String getSelectedVertex() {
+    public Vertex getSelectedVertex() {
         return selectedVertex;
     }
 
-    public void setSelectedVertex(String selectedVertex) {
+    public void setSelectedVertex(Vertex selectedVertex) {
         this.selectedVertex = selectedVertex;
     }
 
@@ -57,22 +61,6 @@ public class ShortestPathModel implements Serializable {
         this.selectedVertexName = selectedVertexName;
     }
 
-    public String getSourceVertex() {
-        return sourceVertex;
-    }
-
-    public void setSourceVertex(String sourceVertex) {
-        this.sourceVertex = sourceVertex;
-    }
-
-    public String getDestinationVertex() {
-        return destinationVertex;
-    }
-
-    public void setDestinationVertex(String destinationVertex) {
-        this.destinationVertex = destinationVertex;
-    }
-
     public boolean isUndirectedGraph() {
         return undirectedGraph;
     }
@@ -87,5 +75,29 @@ public class ShortestPathModel implements Serializable {
 
     public void setTrafficAllowed(boolean trafficAllowed) {
         this.trafficAllowed = trafficAllowed;
+    }
+
+    public Vertex getSourceVertex() {
+        return sourceVertex;
+    }
+
+    public void setSourceVertex(Vertex sourceVertex) {
+        this.sourceVertex = sourceVertex;
+    }
+
+    public Vertex getDestinationVertex() {
+        return destinationVertex;
+    }
+
+    public void setDestinationVertex(Vertex destinationVertex) {
+        this.destinationVertex = destinationVertex;
+    }
+
+    public Edge getSelectedEdge() {
+        return selectedEdge;
+    }
+
+    public void setSelectedEdge(Edge selectedEdge) {
+        this.selectedEdge = selectedEdge;
     }
 }

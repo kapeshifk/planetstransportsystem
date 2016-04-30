@@ -1,6 +1,5 @@
 package za.co.discovery.assignment.helper;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import za.co.discovery.assignment.entity.Edge;
@@ -14,9 +13,6 @@ import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by Kapeshi.Kongolo on 2016/04/18.
- */
 public class GraphTest {
     @Before
     public void setUp() throws Exception {
@@ -27,27 +23,30 @@ public class GraphTest {
     public void verifyThatTrafficOverlayOnGraphIsCorrect() throws Exception {
         //Set
         List<Vertex> vertices = new ArrayList<>();
+        Vertex vertex1 = new Vertex("A", "Earth");
+        Vertex vertex2 = new Vertex("B", "Mars");
+        Vertex vertex3 = new Vertex("C", "Venus");
 
-        Edge edge1 = new Edge(1, "1", "A", "B", 0.44f);
-        Edge edge2 = new Edge(2, "2", "A", "C", 1.89f);
-        Edge edge3 = new Edge(3, "3", "A", "D", 0.10f);
+        Edge edge1 = new Edge("1", vertex1, vertex2, 1.5f);
+        Edge edge2 = new Edge("2", vertex2, vertex3, 2.5f);
+        Edge edge3 = new Edge("3", vertex1, vertex3, 3.5f);
         List<Edge> edges = new ArrayList<>();
         edges.add(edge1);
         edges.add(edge2);
         edges.add(edge3);
 
-        Traffic traffic1 = new Traffic("1", "A", "B", 0.30f);
-        Traffic traffic2 = new Traffic("2", "A", "C", 0.90f);
-        Traffic traffic3 = new Traffic("3", "A", "D", 0.10f);
+        Traffic traffic1 = new Traffic("1", edge1, 0.5f);
+        Traffic traffic2 = new Traffic("2", edge2, 1.0f);
+        Traffic traffic3 = new Traffic("3", edge3, 1.5f);
 
         List<Traffic> traffics = new ArrayList<>();
         traffics.add(traffic1);
         traffics.add(traffic2);
         traffics.add(traffic3);
 
-        Edge edgeExpected1 = new Edge(1, "1", "A", "B", 0.44f, 0.30f);
-        Edge edgeExpected2 = new Edge(2, "2", "A", "C", 1.89f, 0.90f);
-        Edge edgeExpected3 = new Edge(3, "3", "A", "D", 0.10f, 0.10f);
+        Edge edgeExpected1 = new Edge("1", vertex1, vertex2, 2.0f);
+        Edge edgeExpected2 = new Edge("2", vertex2, vertex3, 3.5f);
+        Edge edgeExpected3 = new Edge("3", vertex1, vertex3, 5.0f);
         List<Edge> edgesExpected = new ArrayList<>();
         edgesExpected.add(edgeExpected1);
         edgesExpected.add(edgeExpected2);
@@ -77,18 +76,22 @@ public class GraphTest {
     public void verifyThatUndirectedEdgesOnGraphIsCorrect() throws Exception {
         //Set
         List<Vertex> vertices = new ArrayList<>();
+        Vertex vertexA = new Vertex("A", "Earth");
+        Vertex vertexB = new Vertex("B", "Mars");
+        Vertex vertexC = new Vertex("C", "Venus");
+        Vertex vertexD = new Vertex("D", "Dream Team");
 
-        Edge edge1 = new Edge(1, "1", "A", "B", 0.44f);
-        Edge edge2 = new Edge(2, "2", "A", "C", 1.89f);
-        Edge edge3 = new Edge(3, "3", "A", "D", 0.10f);
+        Edge edge1 = new Edge("1", vertexA, vertexB, 0.44f);
+        Edge edge2 = new Edge("2", vertexA, vertexC, 1.89f);
+        Edge edge3 = new Edge("3", vertexA, vertexD, 0.10f);
         List<Edge> edges = new ArrayList<>();
         edges.add(edge1);
         edges.add(edge2);
         edges.add(edge3);
 
-        Traffic traffic1 = new Traffic("1", "A", "B", 0.30f);
-        Traffic traffic2 = new Traffic("2", "A", "C", 0.90f);
-        Traffic traffic3 = new Traffic("3", "A", "D", 0.10f);
+        Traffic traffic1 = new Traffic("1", edge1, 0.30f);
+        Traffic traffic2 = new Traffic("2", edge2, 0.90f);
+        Traffic traffic3 = new Traffic("3", edge3, 0.10f);
 
         List<Traffic> traffics = new ArrayList<>();
         traffics.add(traffic1);
@@ -106,12 +109,12 @@ public class GraphTest {
         Graph actualGraph = new Graph(vertices, actualEdges, traffics);
 
 
-        Edge edgeExpected1 = new Edge(1, "1", "A", "B", 0.44f);
-        Edge edgeExpected2 = new Edge(0, "1", "B", "A", 0.44f);
-        Edge edgeExpected3 = new Edge(2, "2", "A", "C", 1.89f);
-        Edge edgeExpected4 = new Edge(0, "2", "C", "A", 1.89f);
-        Edge edgeExpected5 = new Edge(3, "3", "A", "D", 0.10f);
-        Edge edgeExpected6 = new Edge(0, "3", "D", "A", 0.10f);
+        Edge edgeExpected1 = new Edge("1", vertexA, vertexB, 0.44f);
+        Edge edgeExpected2 = new Edge("1", vertexB, vertexA, 0.44f);
+        Edge edgeExpected3 = new Edge("2", vertexA, vertexC, 1.89f);
+        Edge edgeExpected4 = new Edge("2", vertexC, vertexA, 1.89f);
+        Edge edgeExpected5 = new Edge("3", vertexA, vertexD, 0.10f);
+        Edge edgeExpected6 = new Edge("3", vertexD, vertexA, 0.10f);
         List<Edge> edgesExpected = new ArrayList<>();
         edgesExpected.add(edgeExpected1);
         edgesExpected.add(edgeExpected2);
@@ -127,35 +130,4 @@ public class GraphTest {
         assertThat(actualGraph, sameBeanAs(expectedGraph));
         assertEquals(actualUndirected, expectedUndirected);
     }
-
-    @Test
-    public void verifyThatObjectsAreEqualIsCorrect() throws Exception {
-        //Set
-        String actualA = "Yes";
-        String actualB = "No";
-        Object actualObjectA = null;
-        Object actualObjectB = null;
-        Object actualObjectNotNullA = new Object();
-        Object actualObjectNotNullB = new Object();
-        Object actualObjectEitherA = null;
-        Object actualObjectEitherB = new Object();
-
-        boolean expectedString = false;
-        boolean expectedObject = true;
-        boolean expectedObjectNotNull = false;
-        boolean expectedObjectEither = false;
-
-        Graph graph = new Graph(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
-        boolean actualString = graph.checkObjectsEqual(actualA, actualB);
-        boolean actualObject = graph.checkObjectsEqual(actualObjectB, actualObjectA);
-        boolean actualObjectNotNull = graph.checkObjectsEqual(actualObjectNotNullA, actualObjectNotNullB);
-        boolean actualObjectEither = graph.checkObjectsEqual(actualObjectEitherA, actualObjectEitherB);
-
-        //Verify
-        assertEquals(expectedString, actualString);
-        assertEquals(expectedObject, actualObject);
-        assertEquals(expectedObjectNotNull, actualObjectNotNull);
-        assertEquals(actualObjectEither, expectedObjectEither);
-    }
-
 }

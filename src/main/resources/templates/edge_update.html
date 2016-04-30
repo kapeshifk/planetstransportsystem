@@ -4,33 +4,32 @@
 
     <title>Interstellar Transport System</title>
 
-    <!--/*/ <th:block th:include="fragments/headerinc :: head"></th:block> /*/-->
+    <!--/*/ <th:block th:include="headers/headerinc :: head"></th:block> /*/-->
 </head>
 <body>
 <div class="container">
-    <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+    <!--/*/ <th:block th:include="headers/header :: header"></th:block> /*/-->
 
     <h2>Update Route</h2>
     <div>
-        <form class="form-horizontal" th:action="@{/edgeupdate}" method="post">
-            <input type="hidden" th:field="*{edge.recordId}"/>
-            <input type="hidden" th:field="*{edge.edgeId}"/>
-            <input type="hidden" th:field="*{edge.source}"/>
-            <input type="hidden" th:field="*{edge.destination}"/>
-            <input type="hidden" th:field="*{edge.timeDelay}"/>
+        <form class="form-horizontal" th:action="@{/update_edge}" method="post">
+            <input type="hidden" th:field="*{edge.id}"/>
+            <input type="hidden" th:field="*{edge.routeId}"/>
+            <input type="hidden" th:field="*{edge.source.id}"/>
+            <input type="hidden" th:field="*{edge.destination.id}"/>
             <div class="form-group">
                 <select id="paths" th:field="*{edgeModel.sourceVertex}" class="form-control input-lg">
                     <option th:each="v : ${routeList}"
-                            th:value="${v.vertexId}"
-                            th:text="${v.name}+' ('+${v.vertexId}+')'">
+                            th:value="${v.id}"
+                            th:text="${v.name}+' ('+${v.id}+')'">
                     </option>
                 </select>
             </div>
             <div class="form-group">
                 <select id="paths1" th:field="*{edgeModel.destinationVertex}" class="form-control input-lg">
                     <option th:each="v : ${routeList}"
-                            th:value="${v.vertexId}"
-                            th:text="${v.name}+' ('+${v.vertexId}+')'">
+                            th:value="${v.id}"
+                            th:text="${v.name}+' ('+${v.id}+')'">
                     </option>
                 </select>
             </div>
