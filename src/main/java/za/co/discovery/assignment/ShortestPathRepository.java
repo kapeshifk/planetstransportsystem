@@ -27,11 +27,13 @@ public class ShortestPathRepository {
     private static final String PLANET_DOES_NOT_EXIST = " does not exist in the Interstellar Transport System.";
     protected PlatformTransactionManager platformTransactionManager;
     private EntityManagerService entityManagerService;
+    private ShortestPathService shortestPathService;
 
     @Autowired
-    public ShortestPathRepository(@Qualifier("transactionManager") PlatformTransactionManager platformTransactionManager, EntityManagerService entityManagerService) {
+    public ShortestPathRepository(@Qualifier("transactionManager") PlatformTransactionManager platformTransactionManager, EntityManagerService entityManagerService, ShortestPathService shortestPathService) {
         this.platformTransactionManager = platformTransactionManager;
         this.entityManagerService = entityManagerService;
+        this.shortestPathService = shortestPathService;
     }
 
     @PostConstruct
@@ -49,7 +51,7 @@ public class ShortestPathRepository {
     public String getShortestPath(String name) {
         StringBuilder path = new StringBuilder();
         Graph graph = entityManagerService.selectGraph();
-        ShortestPathService sp = new ShortestPathService(graph);
+        shortestPathService.initializePlanets(graph);
 
         if (graph == null || graph.getVertexes() == null || graph.getVertexes().isEmpty()) {
             return NO_PLANET_FOUND;
@@ -65,8 +67,8 @@ public class ShortestPathRepository {
             return PATH_NOT_NEEDED + source.getName() + ".";
         }
 
-        sp.run(source);
-        LinkedList<Vertex> paths = sp.getPath(destination);
+        shortestPathService.run(source);
+        LinkedList<Vertex> paths = shortestPathService.getPath(destination);
         if (paths != null) {
             for (Vertex v : paths) {
                 path.append(v.getName() + " (" + v.getId() + ")");

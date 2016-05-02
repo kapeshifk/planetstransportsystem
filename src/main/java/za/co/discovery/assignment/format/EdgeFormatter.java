@@ -17,7 +17,7 @@ public class EdgeFormatter implements Formatter<Edge> {
 
     @Override
     public String print(Edge object, Locale locale) {
-        return object.getRouteId();
+        return String.valueOf(object.getId());
     }
 
     @Override

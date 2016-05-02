@@ -16,6 +16,7 @@ import za.co.discovery.assignment.dao.VertexDao;
 import za.co.discovery.assignment.schema.GetShortestPathRequest;
 import za.co.discovery.assignment.schema.GetShortestPathResponse;
 import za.co.discovery.assignment.service.EntityManagerService;
+import za.co.discovery.assignment.service.ShortestPathService;
 import za.co.discovery.assignment.service.XLSXHandler;
 
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
@@ -23,7 +24,7 @@ import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {XLSXHandler.class, ResourceBean.class, DatasourceBean.class, PersistenceBean.class, WebServiceBean.class,
+@ContextConfiguration(classes = {ShortestPathService.class, XLSXHandler.class, ResourceBean.class, DatasourceBean.class, PersistenceBean.class, WebServiceBean.class,
         ShortestPathEndpoint.class, ShortestPathRepository.class, EntityManagerService.class, EdgeDao.class, VertexDao.class,
         TrafficDao.class},
         loader = AnnotationConfigContextLoader.class)

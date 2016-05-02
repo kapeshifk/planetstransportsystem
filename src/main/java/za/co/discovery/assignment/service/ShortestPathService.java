@@ -23,18 +23,6 @@ public class ShortestPathService {
     public ShortestPathService() {
     }
 
-    public ShortestPathService(Graph graph) {
-        this.vertices = new ArrayList<>(graph.getVertexes());
-        if (graph.isTrafficAllowed()) {
-            graph.processTraffics();
-        }
-        if (graph.isUndirectedGraph()) {
-            this.edges = new ArrayList<>(graph.getUndirectedEdges());
-        } else {
-            this.edges = new ArrayList<>(graph.getEdges());
-        }
-    }
-
     public void initializePlanets(Graph graph) {
         this.vertices = new ArrayList<>(graph.getVertexes());
         if (graph.isTrafficAllowed()) {

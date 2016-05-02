@@ -140,6 +140,8 @@ public class RootController {
         ShortestPathModel pathModel = new ShortestPathModel();
         List vertices = entityManagerService.getAllVertices();
         Edge edgeToEdit = entityManagerService.getEdgeById(id);
+        System.out.println("BEFORE ");
+        System.out.println("THE TRAFFIC ON ROUTE " + edgeToEdit.getRouteId() + " IS " + edgeToEdit.getTraffic().getDelay());
         pathModel.setSourceVertex(edgeToEdit.getSource());
         pathModel.setDestinationVertex(edgeToEdit.getDestination());
         model.addAttribute("edge", edgeToEdit);
@@ -153,7 +155,8 @@ public class RootController {
         GraphMapper mapper = new GraphMapper();
         edge.setSource(pathModel.getSourceVertex());
         edge.setDestination(pathModel.getDestinationVertex());
-
+        System.out.println("AFTER");
+        System.out.println("THE TRAFFIC ON ROUTE " + edge.getRouteId() + " IS STILL " + edge.getTraffic().getDelay());
         if (pathModel.getSourceVertex().equals(pathModel.getDestinationVertex())) {
             String message = DUPLICATE_ROUTE;
             model.addAttribute("validationMessage", message);
@@ -166,7 +169,9 @@ public class RootController {
         }
 
         edge.setRouteId(mapper.createHumanReadableId(edge.getSource().getId(), edge.getDestination().getId()));
+        System.out.println("STILL 1 " + edge.getTraffic());
         entityManagerService.updateEdge(edge);
+        System.out.println("STILL 2 " + edge.getTraffic());
         return "redirect:/edge/" + edge.getId();
     }
 

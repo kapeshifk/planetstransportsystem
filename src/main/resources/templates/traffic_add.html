@@ -20,7 +20,7 @@
                     <select id="route" th:field="*{trafficModel.selectedEdge}" class="form-control input-lg">
                         <option th:each="e : ${trafficList}"
                                 th:value="${e.id}"
-                                th:text="${e.source.name}+' - '+${e.destination.name}">
+                                th:text="${e.source.name}+' ('+${e.source.id}+') - '+${e.destination.name}+' ('+${e.destination.id}+')'">
                         </option>
                     </select>
                 </div>

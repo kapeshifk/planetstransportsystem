@@ -17,7 +17,7 @@ public class VertexFormatter implements Formatter<Vertex> {
 
     @Override
     public String print(Vertex object, Locale locale) {
-        return object.getName();
+        return object.getId();
     }
 
     @Override

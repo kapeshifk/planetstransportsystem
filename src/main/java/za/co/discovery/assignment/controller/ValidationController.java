@@ -1,4 +1,3 @@
-/*
 package za.co.discovery.assignment.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,4 +61,3 @@ public class ValidationController implements ErrorController {
     }
 
 }
-*/

@@ -17,13 +17,11 @@ public class TrafficFormatter implements Formatter<Traffic> {
 
     @Override
     public String print(Traffic object, Locale locale) {
-        System.out.println("GIVE ME ------- ------- " + object);
-        return object.getRouteId();
+        return String.valueOf(object.getId());
     }
 
     @Override
     public Traffic parse(String id, Locale locale) throws ParseException {
-        System.out.println("SOME OF THAT =================== " + id);
         return trafficDao.selectUnique(Long.valueOf(id));
     }
 }

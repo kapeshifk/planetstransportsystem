@@ -62,11 +62,11 @@ public class EdgeDao {
 
     public List<Edge> edgeExists(Edge edge) {
         Session session = sessionFactory.getCurrentSession();
-        String hql = "FROM edge AS E WHERE E.source = :source AND E.destination = :destination";
+        String hql = "FROM edge AS E WHERE E.source = :source AND E.destination = :destination and E.id!=:id";
         Query query = session.createQuery(hql);
         query.setEntity("source", edge.getSource());
         query.setEntity("destination", edge.getDestination());
-
+        query.setParameter("id", edge.getId());
         return query.list();
     }
 

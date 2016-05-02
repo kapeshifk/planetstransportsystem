@@ -16,6 +16,7 @@ import za.co.discovery.assignment.entity.Traffic;
 import za.co.discovery.assignment.entity.Vertex;
 import za.co.discovery.assignment.helper.Graph;
 import za.co.discovery.assignment.service.EntityManagerService;
+import za.co.discovery.assignment.service.ShortestPathService;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -28,12 +29,15 @@ import static org.mockito.Mockito.when;
 
 @Transactional
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {DatasourceBean.class, PersistenceBean.class},
+@ContextConfiguration(classes = {ShortestPathService.class, DatasourceBean.class, PersistenceBean.class},
         loader = AnnotationConfigContextLoader.class)
 public class ShortestPathRepositoryTest {
     @Autowired
     @Qualifier("transactionManager")
     protected PlatformTransactionManager platformTransactionManager;
+
+    @Autowired
+    private ShortestPathService shortestPathService;
 
     @Test
     public void verifyThatDataInitializeAndGiveCorrectPath() throws Exception {
@@ -65,7 +69,7 @@ public class ShortestPathRepositoryTest {
         when(entityManagerService.getVertexById(expectedDestination.getId())).thenReturn(expectedDestination);
 
         path.append("Earth (A)\tPluto (F)\t");
-        ShortestPathRepository pathRepository = new ShortestPathRepository(platformTransactionManager, entityManagerService);
+        ShortestPathRepository pathRepository = new ShortestPathRepository(platformTransactionManager, entityManagerService, shortestPathService);
 
         // Test
         pathRepository.initData();
