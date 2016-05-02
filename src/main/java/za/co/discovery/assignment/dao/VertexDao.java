@@ -1,9 +1,6 @@
 package za.co.discovery.assignment.dao;
 
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.hibernate.*;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -46,12 +43,30 @@ public class VertexDao {
         return query.executeUpdate();
     }
 
+    public void delete(Vertex vertex) {
+        Session session = sessionFactory.getCurrentSession();
+        session.delete(vertex);
+    }
+
     public Vertex selectUnique(String id) {
         Session session = sessionFactory.getCurrentSession();
         Criteria criteria = session.createCriteria(Vertex.class);
         criteria.add(Restrictions.eq("id", id));
 
         return (Vertex) criteria.uniqueResult();
+    }
+
+    public Vertex selectUniqueLazyLoad(String id) {
+        Session session = sessionFactory.getCurrentSession();
+        Criteria criteria = session.createCriteria(Vertex.class);
+        criteria.add(Restrictions.eq("id", id));
+
+        Vertex vertex = (Vertex) criteria.uniqueResult();
+        if (vertex != null) {
+            Hibernate.initialize(vertex.getSourceEdges());
+            Hibernate.initialize(vertex.getDestinationEdges());
+        }
+        return vertex;
     }
 
     public Vertex selectUniqueByName(String name) {

@@ -55,6 +55,8 @@ public class Graph {
     public void processTraffics() {
         for (Traffic traffic : traffics) {
             edges.stream().filter(edge -> edge.equals(traffic.getRoute())).forEach(edge -> {
+                System.out.println("DISTANCE " + edge.getDistance());
+                System.out.println("DELAY " + traffic.getDelay());
                 Float actualDistance = edge.getDistance() + traffic.getDelay();
                 edge.setDistance(actualDistance);
             });

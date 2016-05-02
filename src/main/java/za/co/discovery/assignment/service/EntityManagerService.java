@@ -85,8 +85,9 @@ public class EntityManagerService {
         return vertex;
     }
 
-    public boolean deleteVertex(String vertexId) {
-        vertexDao.delete(vertexId);
+    public boolean deleteVertex(String id) {
+        Vertex vertex = vertexDao.selectUniqueLazyLoad(id);
+        vertexDao.delete(vertex);
         return true;
     }
 
@@ -118,7 +119,8 @@ public class EntityManagerService {
     }
 
     public boolean deleteEdge(long id) {
-        edgeDao.delete(id);
+        Edge edge = edgeDao.selectUniqueLazyLoad(id);
+        edgeDao.delete(edge);
         return true;
     }
 
@@ -141,7 +143,6 @@ public class EntityManagerService {
 
     public Traffic saveTraffic(Traffic traffic) {
         trafficDao.save(traffic);
-        System.out.println("SAVE WORKED");
         return traffic;
     }
 
@@ -151,7 +152,8 @@ public class EntityManagerService {
     }
 
     public boolean deleteTraffic(Long id) {
-        trafficDao.delete(id);
+        Traffic traffic = trafficDao.selectUnique(id);
+        trafficDao.delete(traffic);
         return true;
     }
 

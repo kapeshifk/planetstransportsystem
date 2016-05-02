@@ -14,16 +14,18 @@ import org.springframework.transaction.annotation.Transactional;
 import za.co.discovery.assignment.config.DatasourceBean;
 import za.co.discovery.assignment.config.PersistenceBean;
 import za.co.discovery.assignment.entity.Edge;
+import za.co.discovery.assignment.entity.Traffic;
 import za.co.discovery.assignment.entity.Vertex;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static java.util.Collections.singletonList;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertEquals;
 
 
@@ -149,42 +151,73 @@ public class VertexDaoTest {
         //Set
         Session session = sessionFactory.getCurrentSession();
         Vertex v1 = new Vertex("A", "Earth");
-        Vertex v2 = new Vertex("C", "Mars");
+        Vertex v2 = new Vertex("B", "Moon");
+        Vertex v3 = new Vertex("C", "Jupiter");
+        Vertex v4 = new Vertex("D", "Venus");
 
-        Edge edge1 = new Edge("2", 20f);
+        Edge edge1 = new Edge("1", 20f);
+        Edge edge2 = new Edge("2", 11f);
+        Edge edge3 = new Edge("3", 11f);
 
         v1.addSourceEdges(edge1);
         v2.addDestinationEdges(edge1);
+        v1.addSourceEdges(edge2);
+        v3.addDestinationEdges(edge2);
+        v1.addSourceEdges(edge3);
+        v4.addDestinationEdges(edge3);
+
+        Traffic traffic1 = new Traffic("1", 1f);
+        Traffic traffic2 = new Traffic("2", 1f);
+        Traffic traffic3 = new Traffic("3", 1f);
+
+        edge1.addTraffic(traffic1);
+        edge2.addTraffic(traffic2);
+        edge3.addTraffic(traffic3);
 
         session.save(v1);
         session.save(v2);
+        session.save(v3);
+        session.save(v4);
 
-        List<Vertex> expectedVertexes = singletonList(v2);
+        List<Vertex> expectedVertexes = Arrays.asList(v2, v3, v4);
 
         //Test
-        v1.removeSourceEdges(edge1);
+        /*v1.removeSourceEdges(edge1);
         v2.removeDestinationEdges(edge1);
-        vertexDao.delete(v1.getId());
+        v1.removeSourceEdges(edge2);
+        v3.removeDestinationEdges(edge2);
+        v1.removeSourceEdges(edge3);
+        v4.removeDestinationEdges(edge3);
+        vertexDao.delete(v1.getId());*/
 
-        /*Criteria allEdges1 = session.createCriteria(Edge.class);
-        List<Edge> edgeList = (List<Edge>) allEdges1.list();
+        /*v1.removeSourceEdges(edge1);
+        Vertex vv2 = edge1.getDestination();
+        vv2.removeDestinationEdges(edge1);
+        //v2.removeDestinationEdges(edge1);
+        v1.removeSourceEdges(edge2);
+        Vertex vv3 = edge2.getDestination();
+        vv3.removeDestinationEdges(edge2);
+        //v3.removeDestinationEdges(edge2);
+        v1.removeSourceEdges(edge3);
+        Vertex vv4 = edge3.getDestination();
+        vv4.removeDestinationEdges(edge3);
+        vertexDao.delete(v1.getId());*/
 
-        for (Edge edgeInList : edgeList) {
-            Vertex vertexSource = edgeInList.getSource();
-            if(vertexSource !=null && vertexSource.equals(v1)){
-                vertexSource.removeSourceEdges(edgeInList);
-                Vertex vertexDestination = edgeInList.getDestination();
-                vertexDestination.removeDestinationEdges(edgeInList);
-            }
-
-            Vertex vertexDestination = edgeInList.getDestination();
-            if(vertexDestination!=null && vertexDestination.equals(v1)){
-                vertexDestination.removeDestinationEdges(edgeInList);
-                Vertex source = edgeInList.getSource();
-                source.removeSourceEdges(edgeInList);
-            }
+        List<Edge> sourceEdges = new ArrayList<>(v1.getSourceEdges());
+        for (Edge e : sourceEdges) {
+            v1.removeSourceEdges(e);
+            e.getDestination().removeDestinationEdges(e);
+            //e.removeTraffic();
         }
-        session.delete(v1);*/
+
+        List<Edge> destinationEdges = new ArrayList<>(v1.getDestinationEdges());
+        for (Edge e : destinationEdges) {
+            v1.removeDestinationEdges(e);
+            e.getSource().removeSourceEdges(e);
+            //e.removeTraffic();
+        }
+
+        vertexDao.delete(v1.getId());
 
         Criteria allVertices = session.createCriteria(Vertex.class);
         List<Vertex> persistedVertexes = (List<Vertex>) allVertices.list();
@@ -195,6 +228,7 @@ public class VertexDaoTest {
         // Verify
         assertThat(persistedVertexes, sameBeanAs(expectedVertexes));
         assertThat(edges, is(empty()));
+        //assertThat(edges, is(singletonList(edge2)));
 
         //Rollback for testing purpose
         session.getTransaction().rollback();

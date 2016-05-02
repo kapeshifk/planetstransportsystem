@@ -33,13 +33,9 @@ public class TrafficDao {
         session.merge(traffic);
     }
 
-    public int delete(Long id) {
+    public void delete(Traffic traffic) {
         Session session = sessionFactory.getCurrentSession();
-        String qry = "DELETE FROM traffic AS T WHERE T.id = :idParameter";
-        Query query = session.createQuery(qry);
-        query.setParameter("idParameter", id);
-
-        return query.executeUpdate();
+        session.delete(traffic);
     }
 
     public Traffic selectUnique(Long id) {
@@ -64,16 +60,6 @@ public class TrafficDao {
             Hibernate.initialize(traffic.getRoute());
         }
         return traffic;
-    }
-
-    public List selectTrafficBySourceAndDestination(String source, String destination) {
-        Session session = sessionFactory.getCurrentSession();
-        String hql = "FROM traffic AS T WHERE T.route.source.id = :sourceId AND T.route.destination.id = :destinationId";
-        Query query = session.createQuery(hql);
-        query.setString("sourceId", source);
-        query.setString("destinationId", destination);
-
-        return query.list();
     }
 
     public int findNextId() {

@@ -218,7 +218,7 @@ public class EdgeDaoTest {
         List<Edge> expectedEdges = singletonList(exp);
 
         //Test
-        edgeDao.delete(e2.getId());
+        edgeDao.delete(e2);
         Criteria criteria = session.createCriteria(Edge.class);
         List<Edge> persistedEdges = (List<Edge>) criteria.list();
 

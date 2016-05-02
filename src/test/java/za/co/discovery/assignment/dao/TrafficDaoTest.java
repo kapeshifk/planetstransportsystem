@@ -125,7 +125,7 @@ public class TrafficDaoTest {
         session.save(traffic2);
 
         //Test
-        trafficDao.delete(traffic2.getId());
+        trafficDao.delete(traffic2);
         Criteria criteria = session.createCriteria(Traffic.class);
         List<Traffic> persistedTraffics = (List<Traffic>) criteria.list();
 

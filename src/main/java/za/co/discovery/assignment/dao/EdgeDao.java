@@ -1,9 +1,6 @@
 package za.co.discovery.assignment.dao;
 
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.hibernate.*;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -37,13 +34,9 @@ public class EdgeDao {
         session.merge(edge);
     }
 
-    public int delete(Long id) {
+    public void delete(Edge edge) {
         Session session = sessionFactory.getCurrentSession();
-        String qry = "DELETE FROM edge AS E WHERE E.id = :idParameter";
-        Query query = session.createQuery(qry);
-        query.setParameter("idParameter", id);
-
-        return query.executeUpdate();
+        session.delete(edge);
     }
 
     public int findNextId() {
@@ -57,6 +50,18 @@ public class EdgeDao {
         Criteria criteria = session.createCriteria(Edge.class);
         criteria.add(Restrictions.eq("id", id));
 
+        return (Edge) criteria.uniqueResult();
+    }
+
+    public Edge selectUniqueLazyLoad(Long id) {
+        Session session = sessionFactory.getCurrentSession();
+        Criteria criteria = session.createCriteria(Edge.class);
+        criteria.add(Restrictions.eq("id", id));
+        Edge edge = (Edge) criteria.uniqueResult();
+        if (edge != null) {
+            Hibernate.initialize(edge.getSource().getSourceEdges());
+            Hibernate.initialize(edge.getDestination().getDestinationEdges());
+        }
         return (Edge) criteria.uniqueResult();
     }
 
