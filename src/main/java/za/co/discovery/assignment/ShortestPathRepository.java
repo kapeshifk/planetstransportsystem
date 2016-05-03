@@ -14,10 +14,8 @@ import za.co.discovery.assignment.service.ShortestPathService;
 
 import javax.annotation.PostConstruct;
 import java.util.LinkedList;
+import java.util.Map;
 
-/**
- * Created by Kapeshi.Kongolo on 2016/04/13.
- */
 @Component
 public class ShortestPathRepository {
 
@@ -51,7 +49,6 @@ public class ShortestPathRepository {
     public String getShortestPath(String name) {
         StringBuilder path = new StringBuilder();
         Graph graph = entityManagerService.selectGraph();
-        shortestPathService.initializePlanets(graph);
 
         if (graph == null || graph.getVertexes() == null || graph.getVertexes().isEmpty()) {
             return NO_PLANET_FOUND;
@@ -67,8 +64,8 @@ public class ShortestPathRepository {
             return PATH_NOT_NEEDED + source.getName() + ".";
         }
 
-        shortestPathService.run(source);
-        LinkedList<Vertex> paths = shortestPathService.getPath(destination);
+        Map<Vertex, Vertex> previousPaths = shortestPathService.run(graph, source);
+        LinkedList<Vertex> paths = shortestPathService.getPath(previousPaths, destination);
         if (paths != null) {
             for (Vertex v : paths) {
                 path.append(v.getName() + " (" + v.getId() + ")");

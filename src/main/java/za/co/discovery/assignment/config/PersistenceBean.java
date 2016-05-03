@@ -13,9 +13,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 import java.util.Properties;
 
-/**
- * Created by Kapeshi.Kongolo on 2016/04/09.
- */
 @Configuration
 @EnableTransactionManagement
 public class PersistenceBean {
@@ -51,7 +48,7 @@ public class PersistenceBean {
         Properties properties = new Properties();
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.DerbyTenSevenDialect");
         properties.setProperty("hibernate.show_sql", "false");
-        properties.setProperty("hibernate.hbm2ddl.auto", "create-drop");
+        properties.setProperty("hibernate.hbm2ddl.auto", "create");
 
         return properties;
     }

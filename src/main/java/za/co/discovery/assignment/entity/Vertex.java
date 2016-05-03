@@ -5,9 +5,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Kapeshi.Kongolo on 2016/04/09.
- */
 @Entity(name = "vertex")
 public class Vertex implements Serializable {
 

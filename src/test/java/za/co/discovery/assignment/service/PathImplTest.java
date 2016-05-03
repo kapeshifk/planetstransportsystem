@@ -1,10 +1,10 @@
-package za.co.discovery.assignment.helper;
+package za.co.discovery.assignment.service;
 
-import org.junit.Before;
 import org.junit.Test;
 import za.co.discovery.assignment.entity.Edge;
 import za.co.discovery.assignment.entity.Traffic;
 import za.co.discovery.assignment.entity.Vertex;
+import za.co.discovery.assignment.helper.Graph;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,12 +13,7 @@ import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static org.junit.Assert.assertEquals;
 
-public class GraphTest {
-    @Before
-    public void setUp() throws Exception {
-
-    }
-
+public class PathImplTest {
     @Test
     public void verifyThatTrafficOverlayOnGraphIsCorrect() throws Exception {
         //Set
@@ -59,7 +54,8 @@ public class GraphTest {
         //Test
         Graph actualGraph = new Graph(vertices, edges, traffics);
         actualGraph.setTrafficAllowed(true);
-        actualGraph.processTraffics();
+        PathImpl pathImplementation = new PathImpl();
+        actualGraph = pathImplementation.overlayGraph(actualGraph);
         boolean actualTraffic = actualGraph.isTrafficAllowed();
 
         List<Vertex> verticesExpected = expectedGraph.getVertexes();
@@ -103,7 +99,9 @@ public class GraphTest {
         //Test
         Graph graph = new Graph(vertices, edges, traffics);
         graph.setUndirectedGraph(true);
-        List<Edge> actualEdges = graph.getUndirectedEdges();
+        PathImpl pathImplementation = new PathImpl();
+        graph = pathImplementation.overlayGraph(graph);
+        List<Edge> actualEdges = graph.getEdges();
         boolean actualUndirected = graph.isUndirectedGraph();
 
         Graph actualGraph = new Graph(vertices, actualEdges, traffics);
@@ -130,4 +128,25 @@ public class GraphTest {
         assertThat(actualGraph, sameBeanAs(expectedGraph));
         assertEquals(actualUndirected, expectedUndirected);
     }
+
+    @Test
+    public void getVertexWithLowestDistance() throws Exception {
+
+    }
+
+    @Test
+    public void getShortestDistance() throws Exception {
+
+    }
+
+    @Test
+    public void getDistance() throws Exception {
+
+    }
+
+    @Test
+    public void getNeighbors() throws Exception {
+
+    }
+
 }

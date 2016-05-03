@@ -8,9 +8,6 @@ import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 import za.co.discovery.assignment.schema.GetShortestPathRequest;
 import za.co.discovery.assignment.schema.GetShortestPathResponse;
 
-/**
- * Created by Kapeshi.Kongolo on 2016/04/13.
- */
 @Endpoint
 public class ShortestPathEndpoint {
     private static final String NAMESPACE_URI = "http://spring.io/guides/gs-producing-web-service";

@@ -10,9 +10,6 @@ import za.co.discovery.assignment.entity.Vertex;
 import java.util.List;
 
 
-/**
- * Created by Kapeshi.Kongolo on 2016/04/09.
- */
 @Repository
 @Transactional
 public class VertexDao {

@@ -7,106 +7,43 @@ import za.co.discovery.assignment.helper.Graph;
 
 import java.util.*;
 
-/**
- * Created by Kapeshi.Kongolo on 2016/04/09.
- */
 @Service
-public class ShortestPathService {
+public class ShortestPathService extends PathImpl {
 
-    private List<Vertex> vertices;
-    private List<Edge> edges;
-    private Set<Vertex> visitedVertices;
-    private Set<Vertex> unvisitedVertices;
-    private Map<Vertex, Vertex> previousPaths;
-    private Map<Vertex, Float> distance;
+    public Map<Vertex, Vertex> run(Graph graph, Vertex source) {
+        //Init
+        graph = overlayGraph(graph);
+        List<Edge> edges = graph.getEdges();
+        Map<Vertex, Float> distance = new HashMap<>();
+        Map<Vertex, Vertex> previousPaths = new HashMap<>();
+        Set<Vertex> visitedVertices = new HashSet<>();
+        Set<Vertex> unvisitedVertices = new HashSet<>();
 
-    public ShortestPathService() {
-    }
-
-    public void initializePlanets(Graph graph) {
-        this.vertices = new ArrayList<>(graph.getVertexes());
-        if (graph.isTrafficAllowed()) {
-            graph.processTraffics();
-        }
-        if (graph.isUndirectedGraph()) {
-            this.edges = new ArrayList<>(graph.getUndirectedEdges());
-        } else {
-            this.edges = new ArrayList<>(graph.getEdges());
-        }
-    }
-
-    public void run(Vertex source) {
-        distance = new HashMap<>();
-        previousPaths = new HashMap<>();
-        visitedVertices = new HashSet<>();
-        unvisitedVertices = new HashSet<>();
+        //Set
         distance.put(source, 0f);
         unvisitedVertices.add(source);
+
+        //Find
         while (unvisitedVertices.size() > 0) {
-            Vertex currentVertex = getVertexWithLowestDistance(unvisitedVertices);
+            Vertex currentVertex = getVertexWithLowestDistance(distance, unvisitedVertices);
             visitedVertices.add(currentVertex);
             unvisitedVertices.remove(currentVertex);
-            evaluateNeighborsWithMinimalDistances(currentVertex);
-        }
-    }
-
-    private Vertex getVertexWithLowestDistance(Set<Vertex> vertexes) {
-        Vertex lowestVertex = null;
-        for (Vertex vertex : vertexes) {
-            if (lowestVertex == null) {
-                lowestVertex = vertex;
-            } else if (getShortestDistance(vertex) < getShortestDistance(lowestVertex)) {
-                lowestVertex = vertex;
+            //Evaluate Neighbors With Minimal Distances
+            List<Vertex> adjacentVertices = getNeighbors(edges, visitedVertices, currentVertex);
+            for (Vertex target : adjacentVertices) {
+                float alternateDistance = getShortestDistance(distance, currentVertex) + getDistance(edges, currentVertex, target);
+                if (alternateDistance < getShortestDistance(distance, target)) {
+                    distance.put(target, alternateDistance);
+                    previousPaths.put(target, currentVertex);
+                    unvisitedVertices.add(target);
+                }
             }
         }
-        return lowestVertex;
+        //Collect
+        return previousPaths;
     }
 
-    private void evaluateNeighborsWithMinimalDistances(Vertex currentVertex) {
-        List<Vertex> adjacentVertices = getNeighbors(currentVertex);
-        for (Vertex target : adjacentVertices) {
-            float alternateDistance = getShortestDistance(currentVertex) + getDistance(currentVertex, target);
-            if (alternateDistance < getShortestDistance(target)) {
-                distance.put(target, alternateDistance);
-                previousPaths.put(target, currentVertex);
-                unvisitedVertices.add(target);
-            }
-        }
-    }
-
-    private List<Vertex> getNeighbors(Vertex currentVertex) {
-        List<Vertex> neighbors = new ArrayList<>();
-        for (Edge edge : edges) {
-            if (edge.getSource().equals(currentVertex) && !isVisited(edge.getDestination())) {
-                neighbors.add(edge.getDestination());
-            }
-        }
-        return neighbors;
-    }
-
-    private boolean isVisited(Vertex vertex) {
-        return visitedVertices.contains(vertex);
-    }
-
-    private Float getShortestDistance(Vertex destination) {
-        Float d = distance.get(destination);
-        if (d == null) {
-            return Float.POSITIVE_INFINITY;
-        } else {
-            return d;
-        }
-    }
-
-    private float getDistance(Vertex source, Vertex target) {
-        for (Edge edge : edges) {
-            if (edge.getSource().equals(source) && edge.getDestination().equals(target)) {
-                return edge.getDistance();
-            }
-        }
-        throw new RuntimeException("Error: Something went wrong!");
-    }
-
-    public LinkedList<Vertex> getPath(Vertex target) {
+    public LinkedList<Vertex> getPath(Map<Vertex, Vertex> previousPaths, Vertex target) {
         LinkedList<Vertex> path = new LinkedList<>();
         Vertex step = target;
 
@@ -122,5 +59,4 @@ public class ShortestPathService {
         Collections.reverse(path);
         return path;
     }
-
 }

@@ -1,6 +1,12 @@
 package za.co.discovery.assignment.service;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
+import za.co.discovery.assignment.config.DatasourceBean;
+import za.co.discovery.assignment.config.PersistenceBean;
 import za.co.discovery.assignment.entity.Edge;
 import za.co.discovery.assignment.entity.Traffic;
 import za.co.discovery.assignment.entity.Vertex;
@@ -9,15 +15,20 @@ import za.co.discovery.assignment.helper.Graph;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static org.junit.Assert.assertThat;
 
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = {PathImpl.class, DatasourceBean.class, PersistenceBean.class},
+        loader = AnnotationConfigContextLoader.class)
 public class ShortestPathServiceTest {
 
     @Test
     public void verifyThatShortestPathAlgorithmIsCorrect() throws Exception {
+        //PathImpl pathImplementation = mock(PathImpl.class);
         Vertex vertexA = new Vertex("A", "Earth");
         Vertex vertexB = new Vertex("B", "Moon");
         Vertex vertexC = new Vertex("C", "Jupiter");
@@ -52,9 +63,8 @@ public class ShortestPathServiceTest {
         graph.setTrafficAllowed(true);
         graph.setUndirectedGraph(true);
         ShortestPathService dijkstra = new ShortestPathService();
-        dijkstra.initializePlanets(graph);
-        dijkstra.run(source);
-        LinkedList<Vertex> paths = dijkstra.getPath(destination);
+        Map<Vertex, Vertex> previousPaths = dijkstra.run(graph, source);
+        LinkedList<Vertex> paths = dijkstra.getPath(previousPaths, destination);
         if (paths != null) {
             for (Vertex v : paths) {
                 path.append(v.getId());

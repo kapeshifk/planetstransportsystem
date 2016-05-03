@@ -5,9 +5,6 @@ import za.co.discovery.assignment.entity.Vertex;
 
 import java.io.Serializable;
 
-/**
- * Created by Kapeshi.Kongolo on 2016/04/14.
- */
 public class ShortestPathModel implements Serializable {
 
     private Vertex sourceVertex;

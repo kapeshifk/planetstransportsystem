@@ -17,9 +17,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Created by Kapeshi.Kongolo on 2016/04/10.
- */
 @Service
 public class XLSXHandler {
     private File file;

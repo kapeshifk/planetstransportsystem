@@ -3,9 +3,6 @@ package za.co.discovery.assignment.entity;
 import javax.persistence.*;
 import java.io.Serializable;
 
-/**
- * Created by Kapeshi.Kongolo on 2016/04/09.
- */
 @Entity(name = "edge")
 public class Edge implements Serializable {
 

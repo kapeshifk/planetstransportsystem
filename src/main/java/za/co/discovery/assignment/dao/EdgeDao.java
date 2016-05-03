@@ -9,9 +9,6 @@ import za.co.discovery.assignment.entity.Edge;
 
 import java.util.List;
 
-/**
- * Created by Kapeshi.Kongolo on 2016/04/09.
- */
 @Repository
 @Transactional
 public class EdgeDao {

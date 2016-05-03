@@ -9,9 +9,6 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Created by Kapeshi.Kongolo on 2016/04/09.
- */
 @Configuration
 public class DatasourceBean {
 

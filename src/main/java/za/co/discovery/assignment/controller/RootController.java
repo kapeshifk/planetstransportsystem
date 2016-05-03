@@ -18,6 +18,7 @@ import za.co.discovery.assignment.service.ShortestPathService;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class RootController {
@@ -268,12 +269,11 @@ public class RootController {
         if (pathModel.isUndirectedGraph()) {
             graph.setUndirectedGraph(true);
         }
-        shortestPathService.initializePlanets(graph);
         Vertex source = entityManagerService.getVertexById(pathModel.getVertexId());
         Vertex destination = pathModel.getSelectedVertex();
         //
-        shortestPathService.run(source);
-        LinkedList<Vertex> paths = shortestPathService.getPath(destination);
+        Map<Vertex, Vertex> previousPaths = shortestPathService.run(graph, source);
+        LinkedList<Vertex> paths = shortestPathService.getPath(previousPaths, destination);
         if (paths != null) {
             for (Vertex v : paths) {
                 path.append(v.getName()).append(" (").append(v.getId()).append(")");

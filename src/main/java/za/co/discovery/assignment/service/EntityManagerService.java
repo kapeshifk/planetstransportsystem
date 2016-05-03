@@ -18,9 +18,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by Kapeshi.Kongolo on 2016/04/10.
- */
 @Service
 public class EntityManagerService {
     private VertexDao vertexDao;
@@ -70,7 +67,7 @@ public class EntityManagerService {
     public Graph selectGraph() {
         List<Vertex> vertices = vertexDao.selectAll();
         List<Edge> edges = edgeDao.selectAll();
-        List<Traffic> traffics = trafficDao.selectAll();
+        List<Traffic> traffics = trafficDao.selectAllLazyLoading();
 
         return new Graph(vertices, edges, traffics);
     }

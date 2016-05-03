@@ -36,8 +36,6 @@ import static org.junit.Assert.assertEquals;
 
 public class EdgeDaoTest {
 
-    private static final String QUERY_FOR_TABLE_NAMES =
-            "SELECT [name] FROM sys.tables WHERE [type] = 'U' AND [name] LIKE 'tbl_%'";
     @Autowired
     private SessionFactory sessionFactory;
     private EdgeDao edgeDao;
