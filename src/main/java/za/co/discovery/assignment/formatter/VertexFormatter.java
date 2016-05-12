@@ -1,4 +1,4 @@
-package za.co.discovery.assignment.format;
+package za.co.discovery.assignment.formatter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.expression.ParseException;

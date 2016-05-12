@@ -137,7 +137,7 @@ public class RootController {
     }
 
     @RequestMapping(value = "edge/edit/{id}", method = RequestMethod.GET)
-    public String editEdge(@PathVariable long id, Model model) {
+    public String editEdge(@PathVariable Long id, Model model) {
         ShortestPathModel pathModel = new ShortestPathModel();
         List vertices = entityManagerService.getAllVertices();
         Edge edgeToEdit = entityManagerService.getEdgeById(id);
@@ -178,7 +178,6 @@ public class RootController {
     private void buildEdgeValidation(@ModelAttribute ShortestPathModel pathModel, Model model) {
         String message = "The route from " + pathModel.getSourceVertex().getName() + " (" + pathModel.getSourceVertex().getId() + ") to " + pathModel.getDestinationVertex().getName() + "(" + pathModel.getDestinationVertex().getId() + ") exists already.";
         model.addAttribute("validationMessage", message);
-        model.addAttribute("validationMessage", message);
     }
     //Routes Mapping End
 
@@ -207,7 +206,7 @@ public class RootController {
     }
 
     @RequestMapping(value = "save_traffic", method = RequestMethod.POST)
-    public String saveTraffic(Traffic traffic, @ModelAttribute ShortestPathModel pathModel, Model model) {
+    public String saveTraffic(Traffic traffic, @ModelAttribute ShortestPathModel pathModel) {
         GraphMapper mapper = new GraphMapper();
         traffic.setRoute(pathModel.getSelectedEdge());
         traffic.setRouteId(mapper.createHumanReadableId(traffic.getRoute().getSource().getId(), traffic.getRoute().getDestination().getId()));
@@ -228,7 +227,7 @@ public class RootController {
     }
 
     @RequestMapping(value = "update_traffic", method = RequestMethod.POST)
-    public String updateTraffic(Traffic traffic, @ModelAttribute ShortestPathModel pathModel, Model model) {
+    public String updateTraffic(Traffic traffic, @ModelAttribute ShortestPathModel pathModel) {
         entityManagerService.updateTraffic(traffic);
         return "redirect:/traffic/" + traffic.getId();
     }

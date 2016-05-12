@@ -16,9 +16,9 @@ import za.co.discovery.assignment.dao.VertexDao;
 import za.co.discovery.assignment.schema.GetShortestPathRequest;
 import za.co.discovery.assignment.schema.GetShortestPathResponse;
 import za.co.discovery.assignment.service.EntityManagerService;
-import za.co.discovery.assignment.service.PathImpl;
 import za.co.discovery.assignment.service.ShortestPathService;
 import za.co.discovery.assignment.service.XLSXHandler;
+import za.co.discovery.assignment.service.impl.PathImpl;
 
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;

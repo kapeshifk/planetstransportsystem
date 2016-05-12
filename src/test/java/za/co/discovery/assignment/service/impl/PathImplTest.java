@@ -1,4 +1,4 @@
-package za.co.discovery.assignment.service;
+package za.co.discovery.assignment.service.impl;
 
 import org.junit.Test;
 import za.co.discovery.assignment.entity.Edge;

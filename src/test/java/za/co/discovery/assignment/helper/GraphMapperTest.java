@@ -53,14 +53,7 @@ public class GraphMapperTest {
             mapper.getDestination().addDestinationEdges(edge);
             returnedEdgeMap.put(edgeModel.getSource() + "_" + edgeModel.getDestination(), edge);
         }
-        System.out.println(returnedEdgeMap.size());
 
         assertThat("1", sameBeanAs("1"));
     }
-
-    @Test
-    public void getEdge() throws Exception {
-
-    }
-
 }

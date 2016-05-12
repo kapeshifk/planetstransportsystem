@@ -22,13 +22,12 @@ import static org.junit.Assert.assertThat;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {PathImpl.class, DatasourceBean.class, PersistenceBean.class},
+@ContextConfiguration(classes = {DatasourceBean.class, PersistenceBean.class},
         loader = AnnotationConfigContextLoader.class)
 public class ShortestPathServiceTest {
 
     @Test
     public void verifyThatShortestPathAlgorithmIsCorrect() throws Exception {
-        //PathImpl pathImplementation = mock(PathImpl.class);
         Vertex vertexA = new Vertex("A", "Earth");
         Vertex vertexB = new Vertex("B", "Moon");
         Vertex vertexC = new Vertex("C", "Jupiter");

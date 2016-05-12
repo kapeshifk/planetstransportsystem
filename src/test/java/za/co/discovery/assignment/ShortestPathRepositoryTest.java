@@ -16,8 +16,8 @@ import za.co.discovery.assignment.entity.Traffic;
 import za.co.discovery.assignment.entity.Vertex;
 import za.co.discovery.assignment.helper.Graph;
 import za.co.discovery.assignment.service.EntityManagerService;
-import za.co.discovery.assignment.service.PathImpl;
 import za.co.discovery.assignment.service.ShortestPathService;
+import za.co.discovery.assignment.service.impl.PathImpl;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

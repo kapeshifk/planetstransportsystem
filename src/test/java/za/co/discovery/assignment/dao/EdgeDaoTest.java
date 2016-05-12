@@ -149,12 +149,6 @@ public class EdgeDaoTest {
         Criteria criteriaEdge = session.createCriteria(Edge.class);
         List<Edge> actualEdges = (List<Edge>) criteriaEdge.list();
 
-        Traffic t = actualTraffics.get(0);
-        System.out.println(t.getRoute().getSource().getName());
-        System.out.println(t.getRoute().getDestination().getName());
-
-        Edge e = actualEdges.get(0);
-
         //Verify
         assertThat(actualTraffics, sameBeanAs(expectedTraffics));
         assertThat(actualEdges, sameBeanAs(expectedEdges));

@@ -13,7 +13,7 @@
     <h2>Edit Planet</h2>
     <div>
         <form class="form-horizontal" th:object="${vertex}" th:action="@{/update_vertex}" method="post">
-            <input type="hidden" th:field="*{Id}"/>
+            <input type="hidden" th:field="*{id}"/>
             <div class="form-group">
                 <label class="col-sm-2 control-label">Name:</label>
                 <div class="col-sm-10">

@@ -10,9 +10,9 @@ import org.springframework.format.Formatter;
 import org.springframework.format.support.FormattingConversionService;
 import org.springframework.format.support.FormattingConversionServiceFactoryBean;
 import org.springframework.web.client.RestTemplate;
-import za.co.discovery.assignment.format.EdgeFormatter;
-import za.co.discovery.assignment.format.TrafficFormatter;
-import za.co.discovery.assignment.format.VertexFormatter;
+import za.co.discovery.assignment.formatter.EdgeFormatter;
+import za.co.discovery.assignment.formatter.TrafficFormatter;
+import za.co.discovery.assignment.formatter.VertexFormatter;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -20,7 +20,7 @@
                 <th>Delete</th>
             </tr>
             <tr th:each="vertex : ${vertices}">
-                <td th:text="${vertex.id}"><a href="/vertices/${vertex.Id}">Id</a></td>
+                <td th:text="${vertex.id}"><a href="/vertices/${vertex.id}">Id</a></td>
                 <td th:text="${vertex.name}">Planet Name</td>
                 <td><a th:href="${'/vertex/' + vertex.id}">View</a></td>
                 <td><a th:href="${'/vertex/edit/' + vertex.id}">Edit</a></td>

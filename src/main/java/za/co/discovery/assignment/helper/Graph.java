@@ -52,6 +52,4 @@ public class Graph {
     public void setTrafficAllowed(boolean trafficAllowed) {
         this.trafficAllowed = trafficAllowed;
     }
-
-
 }
