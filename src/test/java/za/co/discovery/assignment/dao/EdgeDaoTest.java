@@ -330,6 +330,44 @@ public class EdgeDaoTest {
         session.getTransaction().rollback();
     }
 
+    @Test
+    public void verifyThatSelectAllUnusedEdgesIsCorrect() {
+        //Set
+        Session session = sessionFactory.getCurrentSession();
+        Vertex vertex1 = new Vertex("A", "Earth");
+        Vertex vertex2 = new Vertex("B", "Mars");
+
+
+        Edge e1 = new Edge("4", 2.4f);
+        Edge e2 = new Edge("9", 1.3f);
+
+        Traffic traffic1 = new Traffic("2", 1f);
+        Traffic traffic2 = new Traffic("3", 1f);
+        e1.addTraffic(traffic1);
+        e2.addTraffic(traffic2);
+        e2.removeTraffic();
+
+        vertex1.addSourceEdges(e1);
+        vertex1.addDestinationEdges(e2);
+        vertex2.addDestinationEdges(e1);
+        vertex2.addSourceEdges(e2);
+
+
+        session.save(vertex1);
+        session.save(vertex2);
+
+        List<Edge> expectedEdges = Arrays.asList(e2);
+
+        //Test
+        List<Edge> persistedEdge = edgeDao.selectAllUnusedEdges();
+
+        //Verify
+        assertThat(persistedEdge, sameBeanAs(expectedEdges));
+        //Rollback for testing purpose
+
+        session.getTransaction().rollback();
+    }
+
     public void setUpFixtures() {
         nextEdgeRecordId = edgeDao.findNextId();
     }

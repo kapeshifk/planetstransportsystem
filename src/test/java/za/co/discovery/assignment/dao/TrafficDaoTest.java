@@ -137,7 +137,7 @@ public class TrafficDaoTest {
     }
 
     @Test
-    public void verifyThatSelectUniqueTrafficIsCorrect() throws Exception {
+    public void verifyThatSelectUniqueByRouteIdTrafficIsCorrect() throws Exception {
         //Set
         Session session = sessionFactory.getCurrentSession();
         Vertex vertex1 = new Vertex("A", "Earth");
@@ -166,7 +166,36 @@ public class TrafficDaoTest {
     }
 
     @Test
-    public void verifyThatSelecteAllTrafficsIsCorrect() throws Exception {
+    public void verifyThatSelectUniqueIsCorrect() throws Exception {
+        //Set
+        Session session = sessionFactory.getCurrentSession();
+        Vertex vertex1 = new Vertex("A", "Earth");
+        Vertex vertex2 = new Vertex("F", "Moon");
+        Vertex vertex3 = new Vertex("Z", "Congo");
+        session.save(vertex1);
+        session.save(vertex2);
+        session.save(vertex3);
+        Edge edge = new Edge("20", vertex1, vertex2, 20f);
+        Edge edge2 = new Edge("21", vertex1, vertex3, 2.0f);
+        session.save(edge);
+        session.save(edge2);
+
+        Traffic traffic = new Traffic("100", edge, 4f);
+        Traffic expected = new Traffic("5", edge2, 4f);
+        session.save(traffic);
+        session.save(expected);
+
+        //Test
+        Traffic persisted = trafficDao.selectUnique(expected.getId());
+
+        //Verify
+        assertThat(persisted, sameBeanAs(expected));
+        //Rollback for testing purpose
+        session.getTransaction().rollback();
+    }
+
+    @Test
+    public void verifyThatSelectAllTrafficsIsCorrect() throws Exception {
         //Set
         Session session = sessionFactory.getCurrentSession();
         Vertex vertex1 = new Vertex("A", "Earth");

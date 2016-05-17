@@ -38,14 +38,4 @@ public class IndexControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("index"));
     }
-
-   /* @Test
-    public void verifyThatErrorPageViewIsCorrect() throws Exception {
-        String message = "Failed to load the page. Please restart again.";
-        mockMvc.perform(get(controller.getErrorPath()))
-                .andExpect(status().isOk())
-                .andExpect(model().attribute("validationMessage", message))
-                .andExpect(view().name("validation"));
-    }*/
-
 }

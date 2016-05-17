@@ -1,4 +1,3 @@
-/*
 package za.co.discovery.assignment.service;
 
 import org.hibernate.Criteria;
@@ -14,6 +13,7 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.transaction.annotation.Transactional;
 import za.co.discovery.assignment.config.DatasourceBean;
 import za.co.discovery.assignment.config.PersistenceBean;
+import za.co.discovery.assignment.config.ResourceBean;
 import za.co.discovery.assignment.dao.EdgeDao;
 import za.co.discovery.assignment.dao.TrafficDao;
 import za.co.discovery.assignment.dao.VertexDao;
@@ -22,95 +22,108 @@ import za.co.discovery.assignment.entity.Traffic;
 import za.co.discovery.assignment.entity.Vertex;
 import za.co.discovery.assignment.helper.Graph;
 
-import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.shazam.shazamcrest.MatcherAssert.assertThat;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 
-*/
-/**
- * Created by Kapeshi.Kongolo on 2016/04/13.
- *//*
-
 @Transactional
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {TrafficDao.class, EdgeDao.class, VertexDao.class, DatasourceBean.class, PersistenceBean.class},
+@ContextConfiguration(classes = {XLSXHandler.class, TrafficDao.class, EdgeDao.class, VertexDao.class, ResourceBean.class, DatasourceBean.class, PersistenceBean.class},
         loader = AnnotationConfigContextLoader.class)
 public class EntityManagerServiceTest {
-    private static final String EXCEL_FILENAME = "/test.xlsx";
     @Autowired
     private SessionFactory sessionFactory;
+    @Autowired
+    private XLSXHandler xlsxHandler;
     private EdgeDao edgeDao;
     private VertexDao vertexDao;
     private TrafficDao trafficDao;
     private EntityManagerService entityManagerService;
-    private File file;
+    private int nextEdgeRecordId;
+    private int nextTrafficRecordId;
 
     @Before
     public void setUp() throws Exception {
-        URL resource = getClass().getResource(EXCEL_FILENAME);
-        file = new File(resource.toURI());
         edgeDao = new EdgeDao(sessionFactory);
         trafficDao = new TrafficDao(sessionFactory);
         vertexDao = new VertexDao(sessionFactory);
-        entityManagerService = new EntityManagerService(vertexDao, edgeDao, trafficDao);
+        entityManagerService = new EntityManagerService(vertexDao, edgeDao, trafficDao, xlsxHandler);
+    }
+
+    public void setEdgeRecord() {
+        nextEdgeRecordId = edgeDao.findNextId();
+    }
+
+    public void setTrafficRecord() {
+        nextTrafficRecordId = trafficDao.findNextId();
     }
 
     @Test
-    public void verifyThatGraphPersistIsCorrect() throws Exception {
+    public void verifyThatReadExcelAndPersistToGraphIsCorrect() throws Exception {
         Session session = sessionFactory.getCurrentSession();
-        Vertex vertex1 = new Vertex("A", "Earth");
-        Vertex vertex2 = new Vertex("B", "Moon");
-        Vertex vertex3 = new Vertex("C", "Jupiter");
-        Vertex vertex4 = new Vertex("D", "Venus");
-        Vertex vertex5 = new Vertex("E", "Mars");
+        setEdgeRecord();
+        setTrafficRecord();
+        Vertex vertexA = new Vertex("A", "Earth");
+        Vertex vertexB = new Vertex("B", "Moon");
+        Vertex vertexC = new Vertex("C", "Jupiter");
+        Vertex vertexD = new Vertex("D", "Venus");
+        Vertex vertexE = new Vertex("E", "Mars");
 
-        List<Vertex> expectedVertexes = new ArrayList<>();
-        expectedVertexes.add(vertex1);
-        expectedVertexes.add(vertex2);
-        expectedVertexes.add(vertex3);
-        expectedVertexes.add(vertex4);
-        expectedVertexes.add(vertex5);
+        Edge edge1 = new Edge("A_B", 0.44f);
+        edge1.setId(nextEdgeRecordId + 1L);
+        Edge edge2 = new Edge("A_C", 1.89f);
+        edge2.setId(nextEdgeRecordId + 2L);
+        Edge edge3 = new Edge("A_D", 0.10f);
+        edge3.setId(nextEdgeRecordId + 3L);
+        Edge edge4 = new Edge("B_E", 2.44f);
+        edge4.setId(nextEdgeRecordId + 4L);
+        Edge edge5 = new Edge("C_E", 3.45f);
+        edge5.setId(nextEdgeRecordId + 5L);
 
-        Edge edge1 = new Edge(1, "1", "A", "B", 0.44f);
-        Edge edge2 = new Edge(2, "2", "A", "C", 1.89f);
-        Edge edge3 = new Edge(3, "3", "A", "D", 0.10f);
-        Edge edge4 = new Edge(4, "4", "B", "H", 2.44f);
-        Edge edge5 = new Edge(5, "5", "B", "E", 3.45f);
+        Traffic traffic1 = new Traffic("A_B", 0.30f);
+        traffic1.setId(nextTrafficRecordId + 1L);
+        Traffic traffic2 = new Traffic("A_C", 0.90f);
+        traffic2.setId(nextTrafficRecordId + 2L);
+        Traffic traffic3 = new Traffic("A_D", 0.10f);
+        traffic3.setId(nextTrafficRecordId + 3L);
+        Traffic traffic4 = new Traffic("B_E", 0.20f);
+        traffic4.setId(nextTrafficRecordId + 4L);
+        Traffic traffic5 = new Traffic("C_E", 1.30f);
+        traffic5.setId(nextTrafficRecordId + 5L);
 
-        List<Edge> expectedEdges = new ArrayList<>();
-        expectedEdges.add(edge1);
-        expectedEdges.add(edge2);
-        expectedEdges.add(edge3);
-        expectedEdges.add(edge4);
-        expectedEdges.add(edge5);
+        edge1.addTraffic(traffic1);
+        edge2.addTraffic(traffic2);
+        edge3.addTraffic(traffic3);
+        edge4.addTraffic(traffic4);
+        edge5.addTraffic(traffic5);
 
-        Traffic traffic1 = new Traffic("1", "A", "B", 0.30f);
-        Traffic traffic2 = new Traffic("2", "A", "C", 0.90f);
-        Traffic traffic3 = new Traffic("3", "A", "D", 0.10f);
-        Traffic traffic4 = new Traffic("4", "B", "H", 0.20f);
-        Traffic traffic5 = new Traffic("5", "B", "E", 1.30f);
+        vertexA.addSourceEdges(edge1);
+        vertexB.addDestinationEdges(edge1);
+        vertexA.addSourceEdges(edge2);
+        vertexC.addDestinationEdges(edge2);
+        vertexA.addSourceEdges(edge3);
+        vertexD.addDestinationEdges(edge3);
+        vertexB.addSourceEdges(edge4);
+        vertexE.addDestinationEdges(edge4);
+        vertexC.addSourceEdges(edge5);
+        vertexE.addDestinationEdges(edge5);
 
-        List<Traffic> expectedTraffics = new ArrayList<>();
-        expectedTraffics.add(traffic1);
-        expectedTraffics.add(traffic2);
-        expectedTraffics.add(traffic3);
-        expectedTraffics.add(traffic4);
-        expectedTraffics.add(traffic5);
-
-        entityManagerService.readExcelFileAndImportIntoDatabase(file);
+        List<Vertex> vertices = Arrays.asList(vertexA, vertexB, vertexC, vertexD, vertexE);
+        List<Edge> edges = Arrays.asList(edge1, edge2, edge3, edge4, edge5);
+        List<Traffic> traffics = Arrays.asList(traffic1, traffic2, traffic3, traffic4, traffic5);
+        entityManagerService.readExcelFileAndImportIntoDatabase();
         Graph graph = entityManagerService.selectGraph();
 
         List<Edge> readEdges = graph.getEdges();
         List<Vertex> readVertices = graph.getVertexes();
         List<Traffic> readTraffics = graph.getTraffics();
 
-        assertThat(expectedVertexes, sameBeanAs(readVertices));
-        assertThat(expectedEdges, sameBeanAs(readEdges));
-        assertThat(expectedTraffics, sameBeanAs(readTraffics));
+        assertThat(vertices, sameBeanAs(readVertices));
+        assertThat(edges, sameBeanAs(readEdges));
+        assertThat(traffics, sameBeanAs(readTraffics));
 
         //Rollback for testing purpose
         session.getTransaction().rollback();
@@ -140,6 +153,7 @@ public class EntityManagerServiceTest {
         //Set
         Session session = sessionFactory.getCurrentSession();
         Vertex vertex = new Vertex("A", "Earth");
+        session.save(vertex);
 
         Vertex vertexToUpdate = new Vertex("A", "Jupiter");
         List<Vertex> expectedVertexes = new ArrayList<>();
@@ -168,7 +182,7 @@ public class EntityManagerServiceTest {
         boolean expected = true;
 
         //Test
-        boolean returned = entityManagerService.deleteVertex(v2.getVertexId());
+        boolean returned = entityManagerService.deleteVertex(v2.getId());
 
         // Verify
         assertThat(expected, sameBeanAs(returned));
@@ -208,11 +222,11 @@ public class EntityManagerServiceTest {
         session.save(expected);
 
         //Test
-        Vertex persistedVertex = entityManagerService.getVertexById(expected.getVertexId());
+        Vertex persistedVertex = entityManagerService.getVertexById(expected.getId());
 
         //Verify
         assertThat(persistedVertex, sameBeanAs(expected));
-        assertThat(persistedVertex.getVertexId(), sameBeanAs("C"));
+        assertThat(persistedVertex.getId(), sameBeanAs("C"));
         //Rollback for testing purpose
         session.getTransaction().rollback();
     }
@@ -248,7 +262,7 @@ public class EntityManagerServiceTest {
         boolean expected = true;
 
         //Test
-        boolean returned = entityManagerService.vertexExist(vertex1.getVertexId());
+        boolean returned = entityManagerService.vertexExist(vertex1.getId());
 
         //Verify
         assertThat(returned, sameBeanAs(expected));
@@ -262,7 +276,11 @@ public class EntityManagerServiceTest {
     public void verifyThatSaveEdgeIsCorrect() throws Exception {
         //Set
         Session session = sessionFactory.getCurrentSession();
-        Edge edge = new Edge(1, "2", "A", "B", 2f);
+        Vertex vertex1 = new Vertex("A", "Earth");
+        Vertex vertex2 = new Vertex("B", "Mars");
+        session.save(vertex1);
+        session.save(vertex2);
+        Edge edge = new Edge("2", vertex1, vertex2, 2f);
         List<Edge> expectedEdges = new ArrayList<>();
         expectedEdges.add(edge);
         //Test
@@ -281,10 +299,16 @@ public class EntityManagerServiceTest {
     public void verifyThatUpdateEdgeIsCorrect() throws Exception {
         //Set
         Session session = sessionFactory.getCurrentSession();
-        Edge edge = new Edge(1, "2", "A", "B", 2f);
+        Vertex vertex1 = new Vertex("A", "Earth");
+        Vertex vertex2 = new Vertex("B", "Mars");
+        session.save(vertex1);
+        session.save(vertex2);
+        Edge edge = new Edge("20", vertex1, vertex2, 20f);
         session.save(edge);
 
-        Edge edgeToUpdate = new Edge(1, "2", "A", "C", 5.5f);
+        Vertex vertex3 = new Vertex("C", "Moon");
+        session.save(vertex3);
+        Edge edgeToUpdate = new Edge("20", vertex1, vertex3, 20f);
         List<Edge> expectedEdges = new ArrayList<>();
         expectedEdges.add(edgeToUpdate);
 
@@ -294,7 +318,7 @@ public class EntityManagerServiceTest {
         persistedEdges.add(persistedEdge);
 
         assertThat(expectedEdges, sameBeanAs(persistedEdges));
-        assertThat(persistedEdge.getDestination(), sameBeanAs("C"));
+        assertThat(persistedEdge.getDestination(), sameBeanAs(vertex3));
         //Rollback for testing purpose
         session.getTransaction().rollback();
     }
@@ -303,16 +327,26 @@ public class EntityManagerServiceTest {
     public void verifyThatDeleteEdgeIsCorrect() throws Exception {
         //Set
         Session session = sessionFactory.getCurrentSession();
-        Edge edge1 = new Edge(1, "1", "A", "B", 2f);
-        Edge edge2 = new Edge(2, "2", "A", "C", 1.89f);
-        List<Edge> expectedEdges = new ArrayList<>();
-        expectedEdges.add(edge1);
+        Vertex vertex1 = new Vertex("A", "Earth");
+        Vertex vertex2 = new Vertex("B", "Mars");
+        Vertex vertex3 = new Vertex("C", "Moon");
+        Vertex vertex4 = new Vertex("D", "Jupiter");
+        session.save(vertex1);
+        session.save(vertex2);
+        session.save(vertex3);
+        session.save(vertex4);
+
+        Edge edge1 = new Edge("10", vertex1, vertex2, 20.1f);
+        Edge edge2 = new Edge("12", vertex3, vertex4, 1.3f);
         session.save(edge1);
         session.save(edge2);
+        List<Edge> expectedEdges = new ArrayList<>();
+        expectedEdges.add(edge1);
+
         boolean expected = true;
 
         //Test
-        boolean returned = entityManagerService.deleteEdge(edge2.getRecordId());
+        boolean returned = entityManagerService.deleteEdge(edge2.getId());
 
         // Verify
         assertThat(expected, sameBeanAs(returned));
@@ -325,17 +359,22 @@ public class EntityManagerServiceTest {
     public void verifyThatGetEdgeByIdIsCorrect() throws Exception {
         //Set
         Session session = sessionFactory.getCurrentSession();
-        Edge edge1 = new Edge(1, "1", "A", "B", 2f);
-        Edge expected = new Edge(2, "2", "A", "C", 1.89f);
+        Vertex vertex1 = new Vertex("A", "Earth");
+        Vertex vertex2 = new Vertex("B", "Mars");
+        session.save(vertex1);
+        session.save(vertex2);
+
+        Edge edge1 = new Edge("5", vertex1, vertex2, 0.5f);
+        Edge expected = new Edge("1", vertex1, vertex2, 20.1f);
         session.save(edge1);
         session.save(expected);
 
         //Test
-        Edge persistedEdge = entityManagerService.getEdgeById(expected.getRecordId());
+        Edge persistedEdge = entityManagerService.getEdgeById(expected.getId());
 
         //Verify
         assertThat(persistedEdge, sameBeanAs(expected));
-        assertThat(persistedEdge.getDestination(), sameBeanAs("C"));
+        assertThat(persistedEdge.getDestination(), sameBeanAs(vertex2));
         //Rollback for testing purpose
         session.getTransaction().rollback();
     }
@@ -344,8 +383,13 @@ public class EntityManagerServiceTest {
     public void verifyThatGetAllEdgesIsCorrect() throws Exception {
         //Set
         Session session = sessionFactory.getCurrentSession();
-        Edge edge1 = new Edge(1, "1", "A", "B", 2f);
-        Edge edge2 = new Edge(2, "2", "A", "C", 1.89f);
+        Vertex vertex1 = new Vertex("A", "Earth");
+        Vertex vertex2 = new Vertex("B", "Mars");
+        session.save(vertex1);
+        session.save(vertex2);
+
+        Edge edge1 = new Edge("1", vertex1, vertex2, 2.4f);
+        Edge edge2 = new Edge("2", vertex2, vertex1, 1.3f);
         session.save(edge1);
         session.save(edge2);
         List<Edge> expectedEdges = new ArrayList<>();
@@ -365,12 +409,20 @@ public class EntityManagerServiceTest {
     public void verifyThatEdgeExistsIsCorrect() throws Exception {
         //Set
         Session session = sessionFactory.getCurrentSession();
-        Edge edge1 = new Edge(1, "1", "A", "B", 2f);
-        Edge edge2 = new Edge(2, "2", "A", "C", 0.9f);
-        session.save(edge1);
-        session.save(edge2);
+        Vertex vertex1 = new Vertex("A", "Earth");
+        Vertex vertex2 = new Vertex("B", "Mars");
+        Vertex vertex3 = new Vertex("C", "Moon");
+        session.save(vertex1);
+        session.save(vertex2);
+        session.save(vertex3);
 
-        Edge edgeToCommit = new Edge(3, "3", "A", "C", 1.83f);
+        Edge e1 = new Edge("1", vertex1, vertex2, 2.4f);
+        Edge e2 = new Edge("2", vertex1, vertex3, 100.3f);
+        session.save(e1);
+        session.save(e2);
+
+        Edge edgeToCommit = new Edge("3", vertex1, vertex2, 0.3f);
+        edgeToCommit.setId(3L);
 
         boolean expected = true;
 
@@ -383,32 +435,20 @@ public class EntityManagerServiceTest {
         session.getTransaction().rollback();
     }
 
-    @Test
-    public void verifyThatGetEdgeMaxRecordIdIsCorrect() {
-        //Set
-        Session session = sessionFactory.getCurrentSession();
-        Edge e1 = new Edge(1, "30", "A", "B", 0.17f);
-        Edge e2 = new Edge(2, "19", "B", "C", 0.19f);
-        session.save(e1);
-        session.save(e2);
-        long expectedMax = 2;
-
-        //Test
-        long returnMax = entityManagerService.getEdgeMaxRecordId();
-
-        //Verify
-        assertThat(returnMax, sameBeanAs(expectedMax));
-        //Rollback for testing purpose
-        session.getTransaction().rollback();
-    }
-
     //Traffcs
 
     @Test
     public void verifyThatSaveTrafficIsCorrect() throws Exception {
         //Set
         Session session = sessionFactory.getCurrentSession();
-        Traffic traffic = new Traffic("1", "A", "B", 4f);
+        Vertex vertex1 = new Vertex("A", "Earth");
+        Vertex vertex2 = new Vertex("B", "Mars");
+        session.save(vertex1);
+        session.save(vertex2);
+        Edge edge = new Edge("20", vertex1, vertex2, 20f);
+        session.save(edge);
+
+        Traffic traffic = new Traffic("1", edge, 4f);
         List<Traffic> expectedTraffics = new ArrayList<>();
         expectedTraffics.add(traffic);
         //Test
@@ -427,10 +467,23 @@ public class EntityManagerServiceTest {
     public void verifyThatUpdateTrafficIsCorrect() throws Exception {
         //Set
         Session session = sessionFactory.getCurrentSession();
-        Traffic traffic = new Traffic("1", "A", "B", 4f);
-        session.save(traffic);
+        Vertex vertex1 = new Vertex("A", "Earth");
+        Vertex vertex2 = new Vertex("B", "Mars");
+        Vertex vertex3 = new Vertex("C", "Venus");
+        session.save(vertex1);
+        session.save(vertex2);
+        session.save(vertex3);
+        Edge edge = new Edge("20", vertex1, vertex2, 20f);
+        Edge edge2 = new Edge("21", vertex1, vertex3, 2.0f);
+        session.save(edge);
+        session.save(edge2);
 
-        Traffic trafficToUpdate = new Traffic("1", "A", "Z", 4f);
+        Traffic traffic = new Traffic("1", edge, 4f);
+        session.save(traffic);
+        Long id = traffic.getId();
+
+        Traffic trafficToUpdate = new Traffic("1", edge2, 1.2f);
+        trafficToUpdate.setId(id);
         List<Traffic> expectedTraffics = new ArrayList<>();
         expectedTraffics.add(trafficToUpdate);
 
@@ -440,7 +493,7 @@ public class EntityManagerServiceTest {
         persistedTraffics.add(persistedTraffic);
 
         assertThat(expectedTraffics, sameBeanAs(persistedTraffics));
-        assertThat(persistedTraffic.getDestination(), sameBeanAs("Z"));
+        assertThat(persistedTraffic.getRoute(), sameBeanAs(edge2));
         //Rollback for testing purpose
         session.getTransaction().rollback();
     }
@@ -449,8 +502,19 @@ public class EntityManagerServiceTest {
     public void verifyThatDeleteTrafficIsCorrect() throws Exception {
         //Set
         Session session = sessionFactory.getCurrentSession();
-        Traffic traffic1 = new Traffic("1", "A", "B", 4f);
-        Traffic traffic2 = new Traffic("2", "G", "J", 1.9f);
+        Vertex vertex1 = new Vertex("A", "Earth");
+        Vertex vertex2 = new Vertex("B", "Mars");
+        Vertex vertex3 = new Vertex("C", "Venus");
+        session.save(vertex1);
+        session.save(vertex2);
+        session.save(vertex3);
+        Edge edge = new Edge("20", vertex1, vertex2, 20f);
+        Edge edge2 = new Edge("21", vertex1, vertex3, 2.0f);
+        session.save(edge);
+        session.save(edge2);
+
+        Traffic traffic1 = new Traffic("1", edge, 4f);
+        Traffic traffic2 = new Traffic("2", edge2, 2f);
         List<Traffic> expectedTraffics = new ArrayList<>();
         expectedTraffics.add(traffic1);
         session.save(traffic1);
@@ -458,7 +522,7 @@ public class EntityManagerServiceTest {
         boolean expected = true;
 
         //Test
-        boolean returned = entityManagerService.deleteTraffic(traffic2.getRouteId());
+        boolean returned = entityManagerService.deleteTraffic(traffic2.getId());
 
         // Verify
         assertThat(expected, sameBeanAs(returned));
@@ -471,13 +535,24 @@ public class EntityManagerServiceTest {
     public void verifyThatGetTrafficByIdIsCorrect() throws Exception {
         //Set
         Session session = sessionFactory.getCurrentSession();
-        Traffic traffic1 = new Traffic("1", "A", "B", 4f);
-        Traffic expected = new Traffic("2", "F", "K", 1.89f);
-        session.save(traffic1);
+        Vertex vertex1 = new Vertex("A", "Earth");
+        Vertex vertex2 = new Vertex("F", "Moon");
+        Vertex vertex3 = new Vertex("Z", "Congo");
+        session.save(vertex1);
+        session.save(vertex2);
+        session.save(vertex3);
+        Edge edge = new Edge("20", vertex1, vertex2, 20f);
+        Edge edge2 = new Edge("21", vertex1, vertex3, 2.0f);
+        session.save(edge);
+        session.save(edge2);
+
+        Traffic traffic = new Traffic("100", edge, 4f);
+        Traffic expected = new Traffic("5", edge2, 1.89f);
+        session.save(traffic);
         session.save(expected);
 
         //Test
-        Traffic persistedTraffic = entityManagerService.getTrafficById(expected.getRouteId());
+        Traffic persistedTraffic = entityManagerService.getTrafficById(expected.getId());
 
         //Verify
         assertThat(persistedTraffic, sameBeanAs(expected));
@@ -490,8 +565,20 @@ public class EntityManagerServiceTest {
     public void verifyThatGetAllTrafficsIsCorrect() throws Exception {
         //Set
         Session session = sessionFactory.getCurrentSession();
-        Traffic traffic1 = new Traffic("1", "A", "B", 4f);
-        Traffic traffic2 = new Traffic("2", "G", "J", 1.9f);
+        Vertex vertex1 = new Vertex("A", "Earth");
+        Vertex vertex2 = new Vertex("B", "Moon");
+        Vertex vertex3 = new Vertex("C", "Congo");
+        session.save(vertex1);
+        session.save(vertex2);
+        session.save(vertex3);
+
+        Edge edge = new Edge("20", vertex1, vertex2, 1f);
+        Edge edge2 = new Edge("21", vertex1, vertex3, 2.0f);
+        session.save(edge);
+        session.save(edge2);
+
+        Traffic traffic1 = new Traffic("1", edge, 4.1f);
+        Traffic traffic2 = new Traffic("2", edge2, 1.2f);
         session.save(traffic1);
         session.save(traffic2);
         List<Traffic> expectedTraffics = new ArrayList<>();
@@ -506,46 +593,4 @@ public class EntityManagerServiceTest {
         //Rollback for testing purpose
         session.getTransaction().rollback();
     }
-
-    @Test
-    public void verifyThatTrafficExistsIsCorrect() throws Exception {
-        //Set
-        Session session = sessionFactory.getCurrentSession();
-        Traffic traffic1 = new Traffic("1", "A", "B", 4f);
-        Traffic traffic2 = new Traffic("2", "G", "J", 5.9f);
-        session.save(traffic1);
-        session.save(traffic2);
-
-        Traffic trafficToCommit = new Traffic("5", "A", "J", 0.1f);
-
-        boolean expected = false;
-
-        //Test
-        boolean returned = entityManagerService.trafficExists(trafficToCommit);
-
-        //Verify
-        assertThat(returned, sameBeanAs(expected));
-        //Rollback for testing purpose
-        session.getTransaction().rollback();
-    }
-
-    @Test
-    public void verifyThatGetTrafficMaxRecordIdIsCorrect() {
-        //Set
-        Session session = sessionFactory.getCurrentSession();
-        Traffic traffic1 = new Traffic("1", "A", "C", 1.3f);
-        Traffic traffic2 = new Traffic("2", "F", "M", 2.9f);
-        session.save(traffic1);
-        session.save(traffic2);
-        long expectedMax = 2;
-
-        //Test
-        long returnMax = entityManagerService.getTrafficMaxRecordId();
-
-        //Verify
-        assertThat(returnMax, sameBeanAs(expectedMax));
-        //Rollback for testing purpose
-        session.getTransaction().rollback();
-    }
-
-}*/
+}

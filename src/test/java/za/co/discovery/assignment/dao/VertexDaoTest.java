@@ -182,41 +182,12 @@ public class VertexDaoTest {
         List<Vertex> expectedVertexes = Arrays.asList(v2, v3, v4);
 
         //Test
-        /*v1.removeSourceEdges(edge1);
+        v1.removeSourceEdges(edge1);
         v2.removeDestinationEdges(edge1);
         v1.removeSourceEdges(edge2);
         v3.removeDestinationEdges(edge2);
         v1.removeSourceEdges(edge3);
         v4.removeDestinationEdges(edge3);
-        vertexDao.delete(v1.getId());*/
-
-        /*v1.removeSourceEdges(edge1);
-        Vertex vv2 = edge1.getDestination();
-        vv2.removeDestinationEdges(edge1);
-        //v2.removeDestinationEdges(edge1);
-        v1.removeSourceEdges(edge2);
-        Vertex vv3 = edge2.getDestination();
-        vv3.removeDestinationEdges(edge2);
-        //v3.removeDestinationEdges(edge2);
-        v1.removeSourceEdges(edge3);
-        Vertex vv4 = edge3.getDestination();
-        vv4.removeDestinationEdges(edge3);
-        vertexDao.delete(v1.getId());*/
-
-        List<Edge> sourceEdges = new ArrayList<>(v1.getSourceEdges());
-        for (Edge e : sourceEdges) {
-            v1.removeSourceEdges(e);
-            e.getDestination().removeDestinationEdges(e);
-            //e.removeTraffic();
-        }
-
-        List<Edge> destinationEdges = new ArrayList<>(v1.getDestinationEdges());
-        for (Edge e : destinationEdges) {
-            v1.removeDestinationEdges(e);
-            e.getSource().removeSourceEdges(e);
-            //e.removeTraffic();
-        }
-
         vertexDao.delete(v1.getId());
 
         Criteria allVertices = session.createCriteria(Vertex.class);
@@ -228,7 +199,6 @@ public class VertexDaoTest {
         // Verify
         assertThat(persistedVertexes, sameBeanAs(expectedVertexes));
         assertThat(edges, is(empty()));
-        //assertThat(edges, is(singletonList(edge2)));
 
         //Rollback for testing purpose
         session.getTransaction().rollback();

@@ -58,8 +58,8 @@ public class XLSXHandlerTest {
         EdgeModel edge1 = new EdgeModel("1", "A", "B", 0.44f);
         EdgeModel edge2 = new EdgeModel("2", "A", "C", 1.89f);
         EdgeModel edge3 = new EdgeModel("3", "A", "D", 0.10f);
-        EdgeModel edge4 = new EdgeModel("4", "B", "H", 2.44f);
-        EdgeModel edge5 = new EdgeModel("5", "B", "E", 3.45f);
+        EdgeModel edge4 = new EdgeModel("4", "B", "E", 2.44f);
+        EdgeModel edge5 = new EdgeModel("5", "C", "E", 3.45f);
 
         List<EdgeModel> expectedEdges = new ArrayList<>();
         expectedEdges.add(edge1);
@@ -81,8 +81,8 @@ public class XLSXHandlerTest {
         TrafficModel traffic1 = new TrafficModel("1", "A", "B", 0.30f);
         TrafficModel traffic2 = new TrafficModel("2", "A", "C", 0.90f);
         TrafficModel traffic3 = new TrafficModel("3", "A", "D", 0.10f);
-        TrafficModel traffic4 = new TrafficModel("4", "B", "H", 0.20f);
-        TrafficModel traffic5 = new TrafficModel("5", "B", "E", 1.30f);
+        TrafficModel traffic4 = new TrafficModel("4", "B", "E", 0.20f);
+        TrafficModel traffic5 = new TrafficModel("5", "C", "E", 1.30f);
 
         List<TrafficModel> expectedTraffics = new ArrayList<>();
         expectedTraffics.add(traffic1);

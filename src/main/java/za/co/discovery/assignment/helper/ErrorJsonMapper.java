@@ -14,7 +14,7 @@ public class ErrorJsonMapper {
         this.status = status;
         this.error = (String) errorAttributes.get("error");
         this.message = (String) errorAttributes.get("message");
-        this.timeStamp = errorAttributes.get("timestamp").toString();
+        this.timeStamp = errorAttributes.size() == 0 ? "" : errorAttributes.get("timestamp").toString();
         this.trace = (String) errorAttributes.get("trace");
     }
 
