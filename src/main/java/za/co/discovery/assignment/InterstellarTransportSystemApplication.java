@@ -4,8 +4,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.format.Formatter;
 import org.springframework.format.support.FormattingConversionService;
 import org.springframework.format.support.FormattingConversionServiceFactoryBean;
@@ -20,8 +20,9 @@ import java.util.Set;
 
 @SpringBootApplication
 @Configuration
-@ComponentScan
+//@ComponentScan
 @EnableAutoConfiguration
+@ImportResource("classpath:/spring/spring-config.xml")
 public class InterstellarTransportSystemApplication {
 
     public static void main(String[] args) {
