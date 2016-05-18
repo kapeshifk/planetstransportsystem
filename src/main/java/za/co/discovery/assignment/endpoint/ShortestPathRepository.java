@@ -1,6 +1,5 @@
 package za.co.discovery.assignment.endpoint;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -25,7 +24,6 @@ public class ShortestPathRepository {
     private EntityManagerService entityManagerService;
     private ShortestPathService shortestPathService;
 
-    @Autowired
     public ShortestPathRepository(@Qualifier("transactionManager") PlatformTransactionManager platformTransactionManager, EntityManagerService entityManagerService, ShortestPathService shortestPathService) {
         this.platformTransactionManager = platformTransactionManager;
         this.entityManagerService = entityManagerService;
