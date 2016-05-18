@@ -1,8 +1,7 @@
-package za.co.discovery.assignment;
+package za.co.discovery.assignment.endpoint;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
@@ -16,7 +15,6 @@ import javax.annotation.PostConstruct;
 import java.util.LinkedList;
 import java.util.Map;
 
-@Component
 public class ShortestPathRepository {
 
     private static final String PATH_NOT_AVAILABLE = "There is no path to ";

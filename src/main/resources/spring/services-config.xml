@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:contex="http://www.springframework.org/schema/context"
+       xmlns:context="http://www.springframework.org/schema/context"
        xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <import resource="services-config.xml"/>
-    <import resource="persistence-config.xml"/>
-    <import resource="endpoint-config.xml"/>
-
-    <contex:component-scan base-package="za.co.discovery.assignment"/>
+    <context:component-scan base-package="za.co.discovery.assignment.service"/>
+    <context:component-scan base-package="za.co.discovery.assignment.dao"/>
 </beans>

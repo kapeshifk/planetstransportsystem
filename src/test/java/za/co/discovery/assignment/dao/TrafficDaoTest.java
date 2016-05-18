@@ -9,10 +9,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.transaction.annotation.Transactional;
-import za.co.discovery.assignment.config.DatasourceBean;
-import za.co.discovery.assignment.config.PersistenceBean;
 import za.co.discovery.assignment.entity.Edge;
 import za.co.discovery.assignment.entity.Traffic;
 import za.co.discovery.assignment.entity.Vertex;
@@ -26,8 +23,7 @@ import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 
 @Transactional
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {Traffic.class, TrafficDao.class, DatasourceBean.class, PersistenceBean.class},
-        loader = AnnotationConfigContextLoader.class)
+@ContextConfiguration(locations = {"/spring/persistence-config.xml"})
 public class TrafficDaoTest {
     @Autowired
     private SessionFactory sessionFactory;

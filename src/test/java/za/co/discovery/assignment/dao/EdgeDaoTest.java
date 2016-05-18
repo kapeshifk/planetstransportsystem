@@ -9,10 +9,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.transaction.annotation.Transactional;
-import za.co.discovery.assignment.config.DatasourceBean;
-import za.co.discovery.assignment.config.PersistenceBean;
 import za.co.discovery.assignment.entity.Edge;
 import za.co.discovery.assignment.entity.Traffic;
 import za.co.discovery.assignment.entity.Vertex;
@@ -31,8 +28,7 @@ import static org.junit.Assert.assertEquals;
  */
 @Transactional
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {Edge.class, EdgeDao.class, Vertex.class, VertexDao.class, DatasourceBean.class, PersistenceBean.class},
-        loader = AnnotationConfigContextLoader.class)
+@ContextConfiguration(locations = {"/spring/persistence-config.xml"})
 
 public class EdgeDaoTest {
 

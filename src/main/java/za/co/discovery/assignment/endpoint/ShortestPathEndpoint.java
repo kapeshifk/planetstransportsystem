@@ -1,4 +1,4 @@
-package za.co.discovery.assignment;
+package za.co.discovery.assignment.endpoint;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;

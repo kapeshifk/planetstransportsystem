@@ -9,11 +9,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.transaction.annotation.Transactional;
-import za.co.discovery.assignment.config.DatasourceBean;
-import za.co.discovery.assignment.config.PersistenceBean;
-import za.co.discovery.assignment.config.ResourceBean;
 import za.co.discovery.assignment.dao.EdgeDao;
 import za.co.discovery.assignment.dao.TrafficDao;
 import za.co.discovery.assignment.dao.VertexDao;
@@ -31,8 +27,7 @@ import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 
 @Transactional
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {XLSXHandler.class, TrafficDao.class, EdgeDao.class, VertexDao.class, ResourceBean.class, DatasourceBean.class, PersistenceBean.class},
-        loader = AnnotationConfigContextLoader.class)
+@ContextConfiguration(locations = {"/spring/persistence-config.xml", "/spring/services-config.xml"})
 public class EntityManagerServiceTest {
     @Autowired
     private SessionFactory sessionFactory;

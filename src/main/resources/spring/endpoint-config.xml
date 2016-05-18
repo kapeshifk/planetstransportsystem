@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <bean id="shortestPathEndpoint" class="za.co.discovery.assignment.endpoint.ShortestPathEndpoint">
+        <constructor-arg name="pathRepository" ref="pathRepository"/>
+    </bean>
+
+    <bean id="pathRepository" class="za.co.discovery.assignment.endpoint.ShortestPathRepository">
+        <constructor-arg name="entityManagerService" ref="entityManagerService"/>
+        <constructor-arg name="platformTransactionManager" ref="transactionManager"/>
+        <constructor-arg name="shortestPathService" ref="shortestPathService"/>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+        <qualifier value="transactionManager"/>
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+</beans>

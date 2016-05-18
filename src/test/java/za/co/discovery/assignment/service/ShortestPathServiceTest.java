@@ -4,9 +4,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
-import za.co.discovery.assignment.config.DatasourceBean;
-import za.co.discovery.assignment.config.PersistenceBean;
 import za.co.discovery.assignment.entity.Edge;
 import za.co.discovery.assignment.entity.Traffic;
 import za.co.discovery.assignment.entity.Vertex;
@@ -22,8 +19,7 @@ import static org.junit.Assert.assertThat;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {DatasourceBean.class, PersistenceBean.class},
-        loader = AnnotationConfigContextLoader.class)
+@ContextConfiguration(locations = {"/spring/persistence-config.xml"})
 public class ShortestPathServiceTest {
 
     @Test
