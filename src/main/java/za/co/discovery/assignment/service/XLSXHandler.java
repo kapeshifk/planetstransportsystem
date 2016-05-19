@@ -7,6 +7,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.co.discovery.assignment.entity.Vertex;
+import za.co.discovery.assignment.loader.FileLoader;
 import za.co.discovery.assignment.model.EdgeModel;
 import za.co.discovery.assignment.model.TrafficModel;
 
@@ -19,11 +20,18 @@ import java.util.logging.Logger;
 
 @Service
 public class XLSXHandler {
+    private FileLoader loader;
     private File file;
 
     @Autowired
-    public XLSXHandler(File file) {
-        this.file = file;
+    public XLSXHandler(FileLoader loader) {
+        this.loader = loader;
+        try {
+            this.file = this.loader.getResource().getFile();
+        } catch (Exception e) {
+            Logger.getLogger("discovery").log(Level.SEVERE, "Failed to read the excel file " + "" + ", Exit Interstellar Transport System!");
+            System.exit(1);
+        }
     }
 
     public Map<String, Vertex> readVertexes() {

@@ -27,7 +27,7 @@ import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 
 @Transactional
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/spring/persistence-config.xml", "/spring/services-config.xml"})
+@ContextConfiguration(locations = {"/spring/persistence-config.xml", "/spring/services-config.xml", "/spring/import-config.xml"})
 public class EntityManagerServiceTest {
     @Autowired
     private SessionFactory sessionFactory;

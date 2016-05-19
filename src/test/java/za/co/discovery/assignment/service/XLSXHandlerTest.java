@@ -5,8 +5,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
-import za.co.discovery.assignment.config.ResourceBean;
 import za.co.discovery.assignment.entity.Vertex;
 import za.co.discovery.assignment.model.EdgeModel;
 import za.co.discovery.assignment.model.TrafficModel;
@@ -23,8 +21,7 @@ import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
  * Created by Kapeshi.Kongolo on 2016/04/13.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {XLSXHandler.class, ResourceBean.class},
-        loader = AnnotationConfigContextLoader.class)
+@ContextConfiguration(locations = {"/spring/services-config.xml", "/spring/import-config.xml", "/spring/persistence-config.xml"})
 public class XLSXHandlerTest {
     @Autowired
     private XLSXHandler xlsxHandler;

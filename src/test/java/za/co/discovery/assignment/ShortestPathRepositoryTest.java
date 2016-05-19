@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 @Transactional
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/spring/persistence-config.xml", "/spring/services-config.xml"})
+@ContextConfiguration(locations = {"/spring/persistence-config.xml", "/spring/services-config.xml", "/spring/import-config.xml"})
 public class ShortestPathRepositoryTest {
 
     @Autowired
